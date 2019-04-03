@@ -1,0 +1,28 @@
+Log file created at: 2019/04/02 15:28:47
+Running on machine: mr-pc
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0402 15:28:47.179000  4657 json_parser.cpp:18] 
+[
+	1,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/NERD_tree_1",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "\" Press ? for help\n\n.. (up a dir)\n/home/mr/.vim/bundle/color-cpp/server/\n+ \u0007build/\n+ \u0007ClangAnalyzer/\n+ \u0007log/\n  \u0007CMakeLists.txt\n  \u0007json_parser.cpp\n  \u0007json_parser.h\n  \u0007server\u0007*\n  \u0007server.cpp\n  \u0007syntax_analyzer.cpp\n  \u0007syntax_analyzer.h\n  \u0007test.cpp\n  \u0007tmp\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/NERD_tree_1"
+		}
+	}
+]

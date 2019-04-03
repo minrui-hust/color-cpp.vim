@@ -1,0 +1,83 @@
+Log file created at: 2019/04/01 15:56:10
+Running on machine: mr-pc
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0401 15:56:10.087787 14838 json_parser.cpp:18] 
+[
+	1,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");  \n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n        LOG(INFO)<<\"Got Json Packet 0\";\n      if(json_value){\n        LOG(INFO)<<\"Got Json Packet 1\";\n        analyzer.processRequest(*json_value);\n      }\n        LOG(INFO)<<\"Got Json Packet 2\";\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0401 15:56:10.087893 14838 server.cpp:37] Got Json Packet 0
+I0401 15:56:10.087895 14838 server.cpp:39] Got Json Packet 1
+I0401 15:56:10.087896 14838 syntax_analyzer.cpp:13] Processing Request
+I0401 15:56:10.570206 14889 syntax_analyzer.cpp:31] Total highlight: 55
+I0401 15:56:10.570222 14889 syntax_analyzer.cpp:43] kStdinBufferSize VarDecl 17 15
+I0401 15:56:10.570226 14889 syntax_analyzer.cpp:43] 1024 Number 17 34
+I0401 15:56:10.570230 14889 syntax_analyzer.cpp:43] 10 Number 17 41
+I0401 15:56:10.570232 14889 syntax_analyzer.cpp:43] setupGlog FunctionDecl 19 6
+I0401 15:56:10.570235 14889 syntax_analyzer.cpp:43] argv ParmDecl 19 23
+I0401 15:56:10.570237 14889 syntax_analyzer.cpp:43] google NamespaceRef 20 3
+I0401 15:56:10.570240 14889 syntax_analyzer.cpp:43] InitGoogleLogging Function 20 11
+I0401 15:56:10.570243 14889 syntax_analyzer.cpp:43] argv Variable 20 29
+I0401 15:56:10.570245 14889 syntax_analyzer.cpp:43] 0 Number 20 34
+I0401 15:56:10.570248 14889 syntax_analyzer.cpp:43] google NamespaceRef 21 3
+I0401 15:56:10.570250 14889 syntax_analyzer.cpp:43] SetLogDestination Function 21 11
+I0401 15:56:10.570253 14889 syntax_analyzer.cpp:43] google NamespaceRef 21 29
+I0401 15:56:10.570255 14889 syntax_analyzer.cpp:43] GLOG_INFO Variable 21 37
+I0401 15:56:10.570258 14889 syntax_analyzer.cpp:43] main FunctionDecl 24 5
+I0401 15:56:10.570261 14889 syntax_analyzer.cpp:43] argc ParmDecl 24 14
+I0401 15:56:10.570263 14889 syntax_analyzer.cpp:43] argv ParmDecl 24 26
+I0401 15:56:10.570266 14889 syntax_analyzer.cpp:43] setupGlog Function 25 3
+I0401 15:56:10.570271 14889 syntax_analyzer.cpp:43] argv Variable 25 13
+I0401 15:56:10.570273 14889 syntax_analyzer.cpp:43] stdin_buf VarDecl 27 9
+I0401 15:56:10.570276 14889 syntax_analyzer.cpp:43] kStdinBufferSize Variable 27 30
+I0401 15:56:10.570279 14889 syntax_analyzer.cpp:43] 1 Number 27 47
+I0401 15:56:10.570282 14889 syntax_analyzer.cpp:43] size_t TypeRef 28 3
+I0401 15:56:10.570286 14889 syntax_analyzer.cpp:43] stdin_read_size VarDecl 28 10
+I0401 15:56:10.570288 14889 syntax_analyzer.cpp:43] JsonParser TypeRef 29 3
+I0401 15:56:10.570291 14889 syntax_analyzer.cpp:43] parser VarDecl 29 14
+I0401 15:56:10.570293 14889 syntax_analyzer.cpp:43] SyntaxAnalyzer TypeRef 30 3
+I0401 15:56:10.570297 14889 syntax_analyzer.cpp:43] analyzer VarDecl 30 18
+I0401 15:56:10.570299 14889 syntax_analyzer.cpp:43] std NamespaceRef 31 3
+I0401 15:56:10.570303 14889 syntax_analyzer.cpp:43] shared_ptr TemplateRef 31 8
+I0401 15:56:10.570305 14889 syntax_analyzer.cpp:43] std NamespaceRef 31 19
+I0401 15:56:10.570308 14889 syntax_analyzer.cpp:43] string TypeRef 31 24
+I0401 15:56:10.570312 14889 syntax_analyzer.cpp:43] response VarDecl 31 32
+I0401 15:56:10.570314 14889 syntax_analyzer.cpp:43] stdin_read_size Variable 34 5
+I0401 15:56:10.570317 14889 syntax_analyzer.cpp:43] read Function 34 23
+I0401 15:56:10.570320 14889 syntax_analyzer.cpp:43] STDIN_FILENO MacroInstantiation 34 28
+I0401 15:56:10.570323 14889 syntax_analyzer.cpp:43] stdin_buf Variable 34 42
+I0401 15:56:10.570325 14889 syntax_analyzer.cpp:43] kStdinBufferSize Variable 34 53
+I0401 15:56:10.570329 14889 syntax_analyzer.cpp:43] stdin_read_size Variable 35 9
+I0401 15:56:10.570333 14889 syntax_analyzer.cpp:43] 0 Number 35 27
+I0401 15:56:10.570334 14889 syntax_analyzer.cpp:43] json_value VarDecl 36 12
+I0401 15:56:10.570338 14889 syntax_analyzer.cpp:43] parser Variable 36 25
+I0401 15:56:10.570340 14889 syntax_analyzer.cpp:43] parse MemberRefExpr 36 32
+I0401 15:56:10.570343 14889 syntax_analyzer.cpp:43] stdin_buf Variable 36 38
+I0401 15:56:10.570346 14889 syntax_analyzer.cpp:43] stdin_read_size Variable 36 49
+I0401 15:56:10.570349 14889 syntax_analyzer.cpp:43] LOG MacroInstantiation 37 9
+I0401 15:56:10.570353 14889 syntax_analyzer.cpp:43] INFO MemberRefExpr 37 13
+I0401 15:56:10.570355 14889 syntax_analyzer.cpp:43] json_value Variable 38 10
+I0401 15:56:10.570358 14889 syntax_analyzer.cpp:43] LOG MacroInstantiation 39 9
+I0401 15:56:10.570361 14889 syntax_analyzer.cpp:43] INFO MemberRefExpr 39 13
+I0401 15:56:10.570363 14889 syntax_analyzer.cpp:43] analyzer Variable 40 9
+I0

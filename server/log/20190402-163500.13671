@@ -1,0 +1,1493 @@
+Log file created at: 2019/04/02 16:35:00
+Running on machine: mr-pc
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0402 16:35:00.193439 13671 json_parser.cpp:18] 
+[
+	1,
+	{
+		"filename" : "/home/mr/Workspace/loc/src/v2/mapping/src/intensity_map_builder.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-DvtkRenderingVolume_AUTOINIT=\"1(vtkRenderingVolumeOpenGL)\"",
+			"-DvtkIOSQL_AUTOINIT=\"2(vtkIOMySQL,vtkIOPostgreSQL)\"",
+			"-DROS_PACKAGE_NAME=\\\"v2_mapping\\\"",
+			"-isystem",
+			"/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
+			"-DvtkRenderingLIC_AUTOINIT=\"1(vtkRenderingParallelLIC)\"",
+			"-isystem",
+			"/usr/include/x86_64-linux-gnu/qt5",
+			"-Dv2_mapping_EXPORTS",
+			"-DvtkRenderingContext2D_AUTOINIT=\"1(vtkRenderingContextOpenGL)\"",
+			"-I/home/mr/Workspace/loc/src/v2/mapping/map",
+			"-I/usr/lib/openmpi/include",
+			"-I/usr/local/include",
+			"-I/home/mr/Workspace/loc/src/v2/mapping/src",
+			"-DQT_GUI_LIB",
+			"-I/usr/include/tcl",
+			"-Dinertial_nav_EXPORTS",
+			"-I/opt/ros/kinetic/include/opencv-3.3.1-dev",
+			"-I/usr/include/x86_64-linux-gnu/freetype2",
+			"-DvtkIOGeometry_AUTOINIT=\"1(vtkIOMPIParallel)\"",
+			"-DvtkRenderingFreeType_AUTOINIT=\"2(vtkRenderingFreeTypeFontConfig,vtkRenderingMatplotlib)\"",
+			"-DvtkRenderingCore_AUTOINIT=\"4(vtkInteractionStyle,vtkRenderingFreeType,vtkRenderingFreeTypeOpenGL,vtkRenderingOpenGL)\"",
+			"-Dsensor_fusion_EXPORTS",
+			"-I/usr/include/python2.7",
+			"-I/usr/include/vtk-6.2",
+			"-DQT_WIDGETS_LIB",
+			"-I/usr/include/pcl-1.7",
+			"-I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include",
+			"-I/usr/include/freetype2",
+			"-isystem",
+			"/opt/ros/kinetic/include/opencv-3.3.1-dev/opencv",
+			"-DvtkFiltersFlowPaths_AUTOINIT=\"1(vtkFiltersParallelFlowPaths)\"",
+			"-I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent",
+			"-I/usr/include/jsoncpp",
+			"-I/usr/include/ni",
+			"-isystem",
+			"/usr/include/x86_64-linux-gnu/qt5/QtGui",
+			"-DvtkIOImage_AUTOINIT=\"1(vtkIOMPIImage)\"",
+			"-I/home/mr/Workspace/loc/src/v2",
+			"-I/opt/ros/kinetic/include/opencv-3.3.1-dev/opencv",
+			"-I/usr/lib/openmpi/include/openmpi",
+			"-DQT_CORE_LIB",
+			"-I/usr/include/openni2",
+			"-I/home/mr/Workspace/loc/src/v2/build/common/proto",
+			"-I/usr/include/hdf5/openmpi",
+			"-DvtkIOExodus_AUTOINIT=\"1(vtkIOParallelExodus)\"",
+			"-DQT_NO_DEBUG",
+			"-Dcommon_io_EXPORTS",
+			"-I/opt/ros/kinetic/include/xmlrpcpp",
+			"-DROS_PACKAGE_NAME=\\\"common\\\"",
+			"-Dcommon_proto_EXPORTS",
+			"-isystem",
+			"/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64",
+			"-I/usr/include/eigen3",
+			"-I/usr/include/libxml2",
+			"-I/opt/ros/kinetic/include",
+			"-isystem",
+			"/opt/ros/kinetic/include/opencv-3.3.1-dev",
+			"-DDISABLE_PNG",
+			"-DDISABLE_PCAP",
+			"-isystem",
+			"/usr/include/x86_64-linux-gnu/qt5/QtCore",
+			"-DROS_PACKAGE_NAME=\\\"localization\\\"",
+			"-Dcommon_geometry_EXPORTS",
+			"-I/usr/include/x86_64-linux-gnu",
+			"-I/home/mr/Workspace/loc/src/v2/third_party/thread_pool",
+			"-DROSCONSOLE_BACKEND_LOG4CXX",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "// Copyright 2019 Allride.ai. All rights reserved.\n// Authors: Yongjian Zhao (yongjian.zhao@allride.ai)\n\n#include <priority_queue>\n#include <set>\n\n#include \"intensity_map_builder.h\"\n\nvoid ClusterSample::ClusterSample(const ClusterSmaple& other) {\n  this->point_num += other.point_num;\n\n  float other_weight = static_cast<float>(other.point_num) / this->point_num;\n  float this_weight = 1.0f - other_weight;\n\n  this->height = this_weight * this->height + other_weight * other.height;\n  this->intensity = this_weigh * this->intensity + other_weight * other.intensity;\n}\n\nvoid IntensityMapBuilder::buildIntensityMap(const std::string& output_folder) {\n  // To initialize grid2_samples_, each ndt3 grid is one ClusterSample\n  // for each grid2 sample, there are several Cluster\n\n  // height cluster for each grid2_sample\n  for (auto& grid2_smaple : grid2_samples_) {\n    heightCluster(&grid2_smaple.second);\n  }\n\n  // create image acoording to grid2_samples_\n  cv::Mat intensity_image;\n  createImage(&intensity_image);\n\n  // create intensity_map_info according to grid2_samples_\n  /* protoBufType intensity_map_info */\n  createHeightInfo(/*&intensity_map_info*/);\n\n  // save image and intensity_map_info\n  saveIntensityMap(output_folder, intensity_image /*, intensity_map_info*/);\n}\n\nvoid IntensityMapBuilder::heightCluster(std::vector<ClusterSample>* samples) {\n  size_t sample_num = samples->size();\n\n  // make existing_sample_id\n  std::set<size_t> existing_sample_id;\n  for (size_t i = 0; i < sample_num; i++) {\n    existing_sample_id.insert(i);\n  }\n\n  // make distance_queue\n  std::priority_queue<QueueElement, std::vector<QueueElement>, QueueElementCompare> distance_queue;\n  for (size_t i = 0; i < sample_num; i++) {\n    for (size_t j = i + 1; j < sample_num; j++) {\n      float distance = fabs(samples->at(i).height - samples->at(j).height);\n      distance_queue.emplace(distance, i, j);\n    }\n  }\n\n  // cluster\n  const float distance_th = 4.0f;\n  while (true) {\n    // find min_distance between each ClusterSample\n    QueueElement element = distance_queue.top() distance_queue.pop();\n    if (element.distance > distance_th) {\n      break;\n    }\n\n    if (existing_sample_id.count(element.small_id) == 0) {\n      continue;\n    }\n\n    if (existing_sample_id.count(element.big_id) == 0) {\n      continue;\n    }\n\n    // merge two nearest samples\n    samples->at(element.small_id).merge(samples->at(element.big_id));\n    existing_sample_id.erase(element.big_id);\n    sample_num--;\n  }\n\n  if (existing_sample_id.size() != sample_num) {\n    std::cout << \"error: existing_sample_id.size() does not equal to sample_num!\" << std::endl;\n  }\n\n  // save cluster result\n  // need test\n  size_t i = 0;\n  for (size_t id& existing_sample_id) {\n    samples->at<i> = samples->at(id);\n  }\n  samples->resize(sample_num);\n}\n\nvoid IntensityMapBuilder::createImage(cv::Mat* image) {\n  // get necessary information from ndt_map_data_\n  int min_tile_id_x = 0, max_tile_id_x = 10;\n  int min_tile_id_y = 0, max_tile_id_y = 10;\n  float min_height = 0, max_height = 10;\n  float min_intensity = 0, max_intensity = 255;\n\n  int image_width =\n      static_cast<int>((max_tile_id_x - min_tile_id_x + 1) * param_.tile_size / param_.grid_size);\n  int image_height =\n      static_cast<int>((max_tile_id_y - min_tile_id_y + 1) * param_.tile_size / param_.grid_size);\n\n  // make image\n  cv::Mat blank_image = cv::Mat::zeros(image_height, image_width, CV_U8C3);\n  blank_image.copyTo(*image);\n  for (auto grid2_sample : grid2_samples_) {\n    // set pixel value\n  }\n}\n\nvoid IntensityMapBuilder::createHeightInfo(/* protoBufType *intensity_map_info */) {}\n\nbool IntensityMapBuilder::saveIntensityMap(const std::string& output_folder, const cv::Mat& image\n                                           /*const protoBufType *intensity_map_info */) {\n  // check or make output folder\n\n  // save image\n  std::string image_name = output_folder + \"/intensity_image.png\";\n  cv::imwrite(image_name, image);\n\n  // save intensity_map_info\n\n  return true;\n}\n",
+			"filename" : "/home/mr/Workspace/loc/src/v2/mapping/src/intensity_map_builder.cpp"
+		}
+	}
+]
+I0402 16:35:00.232903 13721 TranslationUnit.cpp:182] token number: 657
+I0402 16:35:00.233084 13721 TranslationUnit.cpp:203] Token: // Copyright 2019 Allride.ai. All rights reserved.
+I0402 16:35:00.233090 13721 TranslationUnit.cpp:203] Token: // Authors: Yongjian Zhao (yongjian.zhao@allride.ai)
+I0402 16:35:00.233093 13721 TranslationUnit.cpp:203] Token: #
+I0402 16:35:00.233094 13721 TranslationUnit.cpp:203] Token: include
+I0402 16:35:00.233095 13721 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.233098 13721 TranslationUnit.cpp:203] Token: priority_queue
+I0402 16:35:00.233098 13721 TranslationUnit.cpp:203] Token: >
+I0402 16:35:00.233100 13721 TranslationUnit.cpp:203] Token: #
+I0402 16:35:00.233101 13721 TranslationUnit.cpp:203] Token: include
+I0402 16:35:00.233103 13721 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.233104 13721 TranslationUnit.cpp:203] Token: set
+I0402 16:35:00.233105 13721 TranslationUnit.cpp:203] Token: >
+I0402 16:35:00.233108 13721 TranslationUnit.cpp:203] Token: #
+I0402 16:35:00.233108 13721 TranslationUnit.cpp:203] Token: include
+I0402 16:35:00.233110 13721 TranslationUnit.cpp:203] Token: "intensity_map_builder.h"
+I0402 16:35:00.233111 13721 TranslationUnit.cpp:203] Token: void
+I0402 16:35:00.233114 13721 TranslationUnit.cpp:203] Token: ClusterSample
+I0402 16:35:00.233114 13721 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.233116 13721 TranslationUnit.cpp:203] Token: ClusterSample
+I0402 16:35:00.233117 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233119 13721 TranslationUnit.cpp:203] Token: const
+I0402 16:35:00.233120 13721 TranslationUnit.cpp:203] Token: ClusterSmaple
+I0402 16:35:00.233121 13721 TranslationUnit.cpp:203] Token: &
+I0402 16:35:00.233122 13721 TranslationUnit.cpp:203] Token: other
+I0402 16:35:00.233124 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233125 13721 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.233126 13721 TranslationUnit.cpp:203] Token: this
+I0402 16:35:00.233129 13721 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.233129 13721 TranslationUnit.cpp:203] Token: point_num
+I0402 16:35:00.233131 13721 TranslationUnit.cpp:203] Token: +=
+I0402 16:35:00.233132 13721 TranslationUnit.cpp:203] Token: other
+I0402 16:35:00.233134 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233135 13721 TranslationUnit.cpp:203] Token: point_num
+I0402 16:35:00.233136 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233137 13721 TranslationUnit.cpp:203] Token: float
+I0402 16:35:00.233139 13721 TranslationUnit.cpp:203] Token: other_weight
+I0402 16:35:00.233140 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233141 13721 TranslationUnit.cpp:203] Token: static_cast
+I0402 16:35:00.233144 13721 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.233144 13721 TranslationUnit.cpp:203] Token: float
+I0402 16:35:00.233146 13721 TranslationUnit.cpp:203] Token: >
+I0402 16:35:00.233147 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233148 13721 TranslationUnit.cpp:203] Token: other
+I0402 16:35:00.233150 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233151 13721 TranslationUnit.cpp:203] Token: point_num
+I0402 16:35:00.233152 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233155 13721 TranslationUnit.cpp:203] Token: /
+I0402 16:35:00.233155 13721 TranslationUnit.cpp:203] Token: this
+I0402 16:35:00.233156 13721 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.233158 13721 TranslationUnit.cpp:203] Token: point_num
+I0402 16:35:00.233160 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233160 13721 TranslationUnit.cpp:203] Token: float
+I0402 16:35:00.233162 13721 TranslationUnit.cpp:203] Token: this_weight
+I0402 16:35:00.233163 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233165 13721 TranslationUnit.cpp:203] Token: 1.0f
+I0402 16:35:00.233166 13721 TranslationUnit.cpp:203] Token: -
+I0402 16:35:00.233167 13721 TranslationUnit.cpp:203] Token: other_weight
+I0402 16:35:00.233170 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233170 13721 TranslationUnit.cpp:203] Token: this
+I0402 16:35:00.233171 13721 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.233186 13721 TranslationUnit.cpp:203] Token: height
+I0402 16:35:00.233187 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233188 13721 TranslationUnit.cpp:203] Token: this_weight
+I0402 16:35:00.233189 13721 TranslationUnit.cpp:203] Token: *
+I0402 16:35:00.233191 13721 TranslationUnit.cpp:203] Token: this
+I0402 16:35:00.233192 13721 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.233193 13721 TranslationUnit.cpp:203] Token: height
+I0402 16:35:00.233196 13721 TranslationUnit.cpp:203] Token: +
+I0402 16:35:00.233196 13721 TranslationUnit.cpp:203] Token: other_weight
+I0402 16:35:00.233198 13721 TranslationUnit.cpp:203] Token: *
+I0402 16:35:00.233199 13721 TranslationUnit.cpp:203] Token: other
+I0402 16:35:00.233201 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233201 13721 TranslationUnit.cpp:203] Token: height
+I0402 16:35:00.233203 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233204 13721 TranslationUnit.cpp:203] Token: this
+I0402 16:35:00.233206 13721 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.233207 13721 TranslationUnit.cpp:203] Token: intensity
+I0402 16:35:00.233208 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233211 13721 TranslationUnit.cpp:203] Token: this_weigh
+I0402 16:35:00.233211 13721 TranslationUnit.cpp:203] Token: *
+I0402 16:35:00.233212 13721 TranslationUnit.cpp:203] Token: this
+I0402 16:35:00.233214 13721 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.233216 13721 TranslationUnit.cpp:203] Token: intensity
+I0402 16:35:00.233217 13721 TranslationUnit.cpp:203] Token: +
+I0402 16:35:00.233218 13721 TranslationUnit.cpp:203] Token: other_weight
+I0402 16:35:00.233219 13721 TranslationUnit.cpp:203] Token: *
+I0402 16:35:00.233222 13721 TranslationUnit.cpp:203] Token: other
+I0402 16:35:00.233222 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233223 13721 TranslationUnit.cpp:203] Token: intensity
+I0402 16:35:00.233225 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233227 13721 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.233227 13721 TranslationUnit.cpp:203] Token: void
+I0402 16:35:00.233229 13721 TranslationUnit.cpp:203] Token: IntensityMapBuilder
+I0402 16:35:00.233230 13721 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.233232 13721 TranslationUnit.cpp:203] Token: buildIntensityMap
+I0402 16:35:00.233233 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233235 13721 TranslationUnit.cpp:203] Token: const
+I0402 16:35:00.233237 13721 TranslationUnit.cpp:203] Token: std
+I0402 16:35:00.233237 13721 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.233239 13721 TranslationUnit.cpp:203] Token: string
+I0402 16:35:00.233240 13721 TranslationUnit.cpp:203] Token: &
+I0402 16:35:00.233242 13721 TranslationUnit.cpp:203] Token: output_folder
+I0402 16:35:00.233243 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233244 13721 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.233247 13721 TranslationUnit.cpp:203] Token: // To initialize grid2_samples_, each ndt3 grid is one ClusterSample
+I0402 16:35:00.233248 13721 TranslationUnit.cpp:203] Token: // for each grid2 sample, there are several Cluster
+I0402 16:35:00.233249 13721 TranslationUnit.cpp:203] Token: // height cluster for each grid2_sample
+I0402 16:35:00.233252 13721 TranslationUnit.cpp:203] Token: for
+I0402 16:35:00.233253 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233253 13721 TranslationUnit.cpp:203] Token: auto
+I0402 16:35:00.233255 13721 TranslationUnit.cpp:203] Token: &
+I0402 16:35:00.233256 13721 TranslationUnit.cpp:203] Token: grid2_smaple
+I0402 16:35:00.233258 13721 TranslationUnit.cpp:203] Token: :
+I0402 16:35:00.233259 13721 TranslationUnit.cpp:203] Token: grid2_samples_
+I0402 16:35:00.233260 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233263 13721 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.233263 13721 TranslationUnit.cpp:203] Token: heightCluster
+I0402 16:35:00.233264 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233266 13721 TranslationUnit.cpp:203] Token: &
+I0402 16:35:00.233268 13721 TranslationUnit.cpp:203] Token: grid2_smaple
+I0402 16:35:00.233271 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233273 13721 TranslationUnit.cpp:203] Token: second
+I0402 16:35:00.233275 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233276 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233278 13721 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.233279 13721 TranslationUnit.cpp:203] Token: // create image acoording to grid2_samples_
+I0402 16:35:00.233280 13721 TranslationUnit.cpp:203] Token: cv
+I0402 16:35:00.233283 13721 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.233283 13721 TranslationUnit.cpp:203] Token: Mat
+I0402 16:35:00.233284 13721 TranslationUnit.cpp:203] Token: intensity_image
+I0402 16:35:00.233286 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233287 13721 TranslationUnit.cpp:203] Token: createImage
+I0402 16:35:00.233289 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233290 13721 TranslationUnit.cpp:203] Token: &
+I0402 16:35:00.233291 13721 TranslationUnit.cpp:203] Token: intensity_image
+I0402 16:35:00.233294 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233294 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233296 13721 TranslationUnit.cpp:203] Token: // create intensity_map_info according to grid2_samples_
+I0402 16:35:00.233297 13721 TranslationUnit.cpp:203] Token: /* protoBufType intensity_map_info */
+I0402 16:35:00.233299 13721 TranslationUnit.cpp:203] Token: createHeightInfo
+I0402 16:35:00.233300 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233302 13721 TranslationUnit.cpp:203] Token: /*&intensity_map_info*/
+I0402 16:35:00.233304 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233305 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233306 13721 TranslationUnit.cpp:203] Token: // save image and intensity_map_info
+I0402 16:35:00.233309 13721 TranslationUnit.cpp:203] Token: saveIntensityMap
+I0402 16:35:00.233309 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233311 13721 TranslationUnit.cpp:203] Token: output_folder
+I0402 16:35:00.233312 13721 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.233314 13721 TranslationUnit.cpp:203] Token: intensity_image
+I0402 16:35:00.233315 13721 TranslationUnit.cpp:203] Token: /*, intensity_map_info*/
+I0402 16:35:00.233316 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233319 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233319 13721 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.233320 13721 TranslationUnit.cpp:203] Token: void
+I0402 16:35:00.233322 13721 TranslationUnit.cpp:203] Token: IntensityMapBuilder
+I0402 16:35:00.233323 13721 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.233325 13721 TranslationUnit.cpp:203] Token: heightCluster
+I0402 16:35:00.233326 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233327 13721 TranslationUnit.cpp:203] Token: std
+I0402 16:35:00.233330 13721 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.233330 13721 TranslationUnit.cpp:203] Token: vector
+I0402 16:35:00.233332 13721 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.233333 13721 TranslationUnit.cpp:203] Token: ClusterSample
+I0402 16:35:00.233335 13721 TranslationUnit.cpp:203] Token: >
+I0402 16:35:00.233336 13721 TranslationUnit.cpp:203] Token: *
+I0402 16:35:00.233337 13721 TranslationUnit.cpp:203] Token: samples
+I0402 16:35:00.233338 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233340 13721 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.233341 13721 TranslationUnit.cpp:203] Token: size_t
+I0402 16:35:00.233342 13721 TranslationUnit.cpp:203] Token: sample_num
+I0402 16:35:00.233345 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233345 13721 TranslationUnit.cpp:203] Token: samples
+I0402 16:35:00.233347 13721 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.233348 13721 TranslationUnit.cpp:203] Token: size
+I0402 16:35:00.233350 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233351 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233352 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233355 13721 TranslationUnit.cpp:203] Token: // make existing_sample_id
+I0402 16:35:00.233355 13721 TranslationUnit.cpp:203] Token: std
+I0402 16:35:00.233359 13721 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.233361 13721 TranslationUnit.cpp:203] Token: set
+I0402 16:35:00.233362 13721 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.233363 13721 TranslationUnit.cpp:203] Token: size_t
+I0402 16:35:00.233366 13721 TranslationUnit.cpp:203] Token: >
+I0402 16:35:00.233366 13721 TranslationUnit.cpp:203] Token: existing_sample_id
+I0402 16:35:00.233368 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233369 13721 TranslationUnit.cpp:203] Token: for
+I0402 16:35:00.233371 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233372 13721 TranslationUnit.cpp:203] Token: size_t
+I0402 16:35:00.233373 13721 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.233374 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233376 13721 TranslationUnit.cpp:203] Token: 0
+I0402 16:35:00.233377 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233379 13721 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.233381 13721 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.233381 13721 TranslationUnit.cpp:203] Token: sample_num
+I0402 16:35:00.233383 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233384 13721 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.233386 13721 TranslationUnit.cpp:203] Token: ++
+I0402 16:35:00.233387 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233388 13721 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.233391 13721 TranslationUnit.cpp:203] Token: existing_sample_id
+I0402 16:35:00.233392 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233392 13721 TranslationUnit.cpp:203] Token: insert
+I0402 16:35:00.233394 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233395 13721 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.233397 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233398 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233399 13721 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.233402 13721 TranslationUnit.cpp:203] Token: // make distance_queue
+I0402 16:35:00.233402 13721 TranslationUnit.cpp:203] Token: std
+I0402 16:35:00.233404 13721 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.233405 13721 TranslationUnit.cpp:203] Token: priority_queue
+I0402 16:35:00.233407 13721 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.233408 13721 TranslationUnit.cpp:203] Token: QueueElement
+I0402 16:35:00.233409 13721 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.233410 13721 TranslationUnit.cpp:203] Token: std
+I0402 16:35:00.233412 13721 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.233413 13721 TranslationUnit.cpp:203] Token: vector
+I0402 16:35:00.233415 13721 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.233417 13721 TranslationUnit.cpp:203] Token: QueueElement
+I0402 16:35:00.233417 13721 TranslationUnit.cpp:203] Token: >
+I0402 16:35:00.233419 13721 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.233420 13721 TranslationUnit.cpp:203] Token: QueueElementCompare
+I0402 16:35:00.233422 13721 TranslationUnit.cpp:203] Token: >
+I0402 16:35:00.233423 13721 TranslationUnit.cpp:203] Token: distance_queue
+I0402 16:35:00.233424 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233427 13721 TranslationUnit.cpp:203] Token: for
+I0402 16:35:00.233428 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233428 13721 TranslationUnit.cpp:203] Token: size_t
+I0402 16:35:00.233430 13721 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.233431 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233433 13721 TranslationUnit.cpp:203] Token: 0
+I0402 16:35:00.233434 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233435 13721 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.233438 13721 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.233438 13721 TranslationUnit.cpp:203] Token: sample_num
+I0402 16:35:00.233439 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233441 13721 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.233443 13721 TranslationUnit.cpp:203] Token: ++
+I0402 16:35:00.233443 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233445 13721 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.233449 13721 TranslationUnit.cpp:203] Token: for
+I0402 16:35:00.233450 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233453 13721 TranslationUnit.cpp:203] Token: size_t
+I0402 16:35:00.233453 13721 TranslationUnit.cpp:203] Token: j
+I0402 16:35:00.233454 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233456 13721 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.233458 13721 TranslationUnit.cpp:203] Token: +
+I0402 16:35:00.233458 13721 TranslationUnit.cpp:203] Token: 1
+I0402 16:35:00.233460 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233461 13721 TranslationUnit.cpp:203] Token: j
+I0402 16:35:00.233464 13721 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.233464 13721 TranslationUnit.cpp:203] Token: sample_num
+I0402 16:35:00.233465 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233467 13721 TranslationUnit.cpp:203] Token: j
+I0402 16:35:00.233469 13721 TranslationUnit.cpp:203] Token: ++
+I0402 16:35:00.233469 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233471 13721 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.233472 13721 TranslationUnit.cpp:203] Token: float
+I0402 16:35:00.233474 13721 TranslationUnit.cpp:203] Token: distance
+I0402 16:35:00.233475 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233476 13721 TranslationUnit.cpp:203] Token: fabs
+I0402 16:35:00.233479 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233479 13721 TranslationUnit.cpp:203] Token: samples
+I0402 16:35:00.233480 13721 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.233482 13721 TranslationUnit.cpp:203] Token: at
+I0402 16:35:00.233484 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233484 13721 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.233486 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233487 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233489 13721 TranslationUnit.cpp:203] Token: height
+I0402 16:35:00.233490 13721 TranslationUnit.cpp:203] Token: -
+I0402 16:35:00.233491 13721 TranslationUnit.cpp:203] Token: samples
+I0402 16:35:00.233494 13721 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.233494 13721 TranslationUnit.cpp:203] Token: at
+I0402 16:35:00.233495 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233497 13721 TranslationUnit.cpp:203] Token: j
+I0402 16:35:00.233498 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233500 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233501 13721 TranslationUnit.cpp:203] Token: height
+I0402 16:35:00.233502 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233505 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233505 13721 TranslationUnit.cpp:203] Token: distance_queue
+I0402 16:35:00.233506 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233508 13721 TranslationUnit.cpp:203] Token: emplace
+I0402 16:35:00.233510 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233510 13721 TranslationUnit.cpp:203] Token: distance
+I0402 16:35:00.233512 13721 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.233513 13721 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.233515 13721 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.233516 13721 TranslationUnit.cpp:203] Token: j
+I0402 16:35:00.233517 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233520 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233520 13721 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.233521 13721 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.233523 13721 TranslationUnit.cpp:203] Token: // cluster
+I0402 16:35:00.233525 13721 TranslationUnit.cpp:203] Token: const
+I0402 16:35:00.233526 13721 TranslationUnit.cpp:203] Token: float
+I0402 16:35:00.233527 13721 TranslationUnit.cpp:203] Token: distance_th
+I0402 16:35:00.233528 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233530 13721 TranslationUnit.cpp:203] Token: 4.0f
+I0402 16:35:00.233531 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233533 13721 TranslationUnit.cpp:203] Token: while
+I0402 16:35:00.233534 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233536 13721 TranslationUnit.cpp:203] Token: true
+I0402 16:35:00.233539 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233541 13721 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.233542 13721 TranslationUnit.cpp:203] Token: // find min_distance between each ClusterSample
+I0402 16:35:00.233544 13721 TranslationUnit.cpp:203] Token: QueueElement
+I0402 16:35:00.233546 13721 TranslationUnit.cpp:203] Token: element
+I0402 16:35:00.233547 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233548 13721 TranslationUnit.cpp:203] Token: distance_queue
+I0402 16:35:00.233549 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233551 13721 TranslationUnit.cpp:203] Token: top
+I0402 16:35:00.233552 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233554 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233556 13721 TranslationUnit.cpp:203] Token: distance_queue
+I0402 16:35:00.233556 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233558 13721 TranslationUnit.cpp:203] Token: pop
+I0402 16:35:00.233559 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233561 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233562 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233563 13721 TranslationUnit.cpp:203] Token: if
+I0402 16:35:00.233566 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233566 13721 TranslationUnit.cpp:203] Token: element
+I0402 16:35:00.233567 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233569 13721 TranslationUnit.cpp:203] Token: distance
+I0402 16:35:00.233570 13721 TranslationUnit.cpp:203] Token: >
+I0402 16:35:00.233572 13721 TranslationUnit.cpp:203] Token: distance_th
+I0402 16:35:00.233573 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233574 13721 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.233577 13721 TranslationUnit.cpp:203] Token: break
+I0402 16:35:00.233577 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233579 13721 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.233580 13721 TranslationUnit.cpp:203] Token: if
+I0402 16:35:00.233582 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233583 13721 TranslationUnit.cpp:203] Token: existing_sample_id
+I0402 16:35:00.233584 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233585 13721 TranslationUnit.cpp:203] Token: count
+I0402 16:35:00.233587 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233588 13721 TranslationUnit.cpp:203] Token: element
+I0402 16:35:00.233590 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233592 13721 TranslationUnit.cpp:203] Token: small_id
+I0402 16:35:00.233592 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233594 13721 TranslationUnit.cpp:203] Token: ==
+I0402 16:35:00.233595 13721 TranslationUnit.cpp:203] Token: 0
+I0402 16:35:00.233597 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233598 13721 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.233599 13721 TranslationUnit.cpp:203] Token: continue
+I0402 16:35:00.233602 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233603 13721 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.233603 13721 TranslationUnit.cpp:203] Token: if
+I0402 16:35:00.233605 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233606 13721 TranslationUnit.cpp:203] Token: existing_sample_id
+I0402 16:35:00.233608 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233609 13721 TranslationUnit.cpp:203] Token: count
+I0402 16:35:00.233610 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233613 13721 TranslationUnit.cpp:203] Token: element
+I0402 16:35:00.233613 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233614 13721 TranslationUnit.cpp:203] Token: big_id
+I0402 16:35:00.233616 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233618 13721 TranslationUnit.cpp:203] Token: ==
+I0402 16:35:00.233619 13721 TranslationUnit.cpp:203] Token: 0
+I0402 16:35:00.233620 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233621 13721 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.233623 13721 TranslationUnit.cpp:203] Token: continue
+I0402 16:35:00.233624 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233625 13721 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.233630 13721 TranslationUnit.cpp:203] Token: // merge two nearest samples
+I0402 16:35:00.233631 13721 TranslationUnit.cpp:203] Token: samples
+I0402 16:35:00.233633 13721 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.233634 13721 TranslationUnit.cpp:203] Token: at
+I0402 16:35:00.233635 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233638 13721 TranslationUnit.cpp:203] Token: element
+I0402 16:35:00.233639 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233640 13721 TranslationUnit.cpp:203] Token: small_id
+I0402 16:35:00.233641 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233642 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233644 13721 TranslationUnit.cpp:203] Token: merge
+I0402 16:35:00.233645 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233646 13721 TranslationUnit.cpp:203] Token: samples
+I0402 16:35:00.233649 13721 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.233649 13721 TranslationUnit.cpp:203] Token: at
+I0402 16:35:00.233651 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233652 13721 TranslationUnit.cpp:203] Token: element
+I0402 16:35:00.233654 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233655 13721 TranslationUnit.cpp:203] Token: big_id
+I0402 16:35:00.233656 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233657 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233659 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233660 13721 TranslationUnit.cpp:203] Token: existing_sample_id
+I0402 16:35:00.233662 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233664 13721 TranslationUnit.cpp:203] Token: erase
+I0402 16:35:00.233664 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233666 13721 TranslationUnit.cpp:203] Token: element
+I0402 16:35:00.233667 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233669 13721 TranslationUnit.cpp:203] Token: big_id
+I0402 16:35:00.233670 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233671 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233673 13721 TranslationUnit.cpp:203] Token: sample_num
+I0402 16:35:00.233675 13721 TranslationUnit.cpp:203] Token: --
+I0402 16:35:00.233675 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233677 13721 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.233678 13721 TranslationUnit.cpp:203] Token: if
+I0402 16:35:00.233680 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233681 13721 TranslationUnit.cpp:203] Token: existing_sample_id
+I0402 16:35:00.233682 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233685 13721 TranslationUnit.cpp:203] Token: size
+I0402 16:35:00.233685 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233687 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233688 13721 TranslationUnit.cpp:203] Token: !=
+I0402 16:35:00.233690 13721 TranslationUnit.cpp:203] Token: sample_num
+I0402 16:35:00.233691 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233692 13721 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.233693 13721 TranslationUnit.cpp:203] Token: std
+I0402 16:35:00.233695 13721 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.233696 13721 TranslationUnit.cpp:203] Token: cout
+I0402 16:35:00.233698 13721 TranslationUnit.cpp:203] Token: <<
+I0402 16:35:00.233700 13721 TranslationUnit.cpp:203] Token: "error: existing_sample_id.size() does not equal to sample_num!"
+I0402 16:35:00.233701 13721 TranslationUnit.cpp:203] Token: <<
+I0402 16:35:00.233702 13721 TranslationUnit.cpp:203] Token: std
+I0402 16:35:00.233703 13721 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.233705 13721 TranslationUnit.cpp:203] Token: endl
+I0402 16:35:00.233706 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233708 13721 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.233709 13721 TranslationUnit.cpp:203] Token: // save cluster result
+I0402 16:35:00.233711 13721 TranslationUnit.cpp:203] Token: // need test
+I0402 16:35:00.233712 13721 TranslationUnit.cpp:203] Token: size_t
+I0402 16:35:00.233713 13721 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.233716 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233719 13721 TranslationUnit.cpp:203] Token: 0
+I0402 16:35:00.233721 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233722 13721 TranslationUnit.cpp:203] Token: for
+I0402 16:35:00.233723 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233724 13721 TranslationUnit.cpp:203] Token: size_t
+I0402 16:35:00.233726 13721 TranslationUnit.cpp:203] Token: id
+I0402 16:35:00.233727 13721 TranslationUnit.cpp:203] Token: &
+I0402 16:35:00.233729 13721 TranslationUnit.cpp:203] Token: existing_sample_id
+I0402 16:35:00.233731 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233731 13721 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.233733 13721 TranslationUnit.cpp:203] Token: samples
+I0402 16:35:00.233734 13721 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.233736 13721 TranslationUnit.cpp:203] Token: at
+I0402 16:35:00.233737 13721 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.233738 13721 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.233741 13721 TranslationUnit.cpp:203] Token: >
+I0402 16:35:00.233741 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233742 13721 TranslationUnit.cpp:203] Token: samples
+I0402 16:35:00.233744 13721 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.233745 13721 TranslationUnit.cpp:203] Token: at
+I0402 16:35:00.233747 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233748 13721 TranslationUnit.cpp:203] Token: id
+I0402 16:35:00.233749 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233750 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233752 13721 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.233753 13721 TranslationUnit.cpp:203] Token: samples
+I0402 16:35:00.233755 13721 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.233757 13721 TranslationUnit.cpp:203] Token: resize
+I0402 16:35:00.233757 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233759 13721 TranslationUnit.cpp:203] Token: sample_num
+I0402 16:35:00.233760 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233762 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233763 13721 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.233764 13721 TranslationUnit.cpp:203] Token: void
+I0402 16:35:00.233767 13721 TranslationUnit.cpp:203] Token: IntensityMapBuilder
+I0402 16:35:00.233767 13721 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.233768 13721 TranslationUnit.cpp:203] Token: createImage
+I0402 16:35:00.233770 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233772 13721 TranslationUnit.cpp:203] Token: cv
+I0402 16:35:00.233772 13721 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.233774 13721 TranslationUnit.cpp:203] Token: Mat
+I0402 16:35:00.233775 13721 TranslationUnit.cpp:203] Token: *
+I0402 16:35:00.233777 13721 TranslationUnit.cpp:203] Token: image
+I0402 16:35:00.233778 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233779 13721 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.233781 13721 TranslationUnit.cpp:203] Token: // get necessary information from ndt_map_data_
+I0402 16:35:00.233783 13721 TranslationUnit.cpp:203] Token: int
+I0402 16:35:00.233784 13721 TranslationUnit.cpp:203] Token: min_tile_id_x
+I0402 16:35:00.233785 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233786 13721 TranslationUnit.cpp:203] Token: 0
+I0402 16:35:00.233788 13721 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.233789 13721 TranslationUnit.cpp:203] Token: max_tile_id_x
+I0402 16:35:00.233791 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233793 13721 TranslationUnit.cpp:203] Token: 10
+I0402 16:35:00.233793 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233795 13721 TranslationUnit.cpp:203] Token: int
+I0402 16:35:00.233796 13721 TranslationUnit.cpp:203] Token: min_tile_id_y
+I0402 16:35:00.233798 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233799 13721 TranslationUnit.cpp:203] Token: 0
+I0402 16:35:00.233800 13721 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.233803 13721 TranslationUnit.cpp:203] Token: max_tile_id_y
+I0402 16:35:00.233803 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233808 13721 TranslationUnit.cpp:203] Token: 10
+I0402 16:35:00.233809 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233810 13721 TranslationUnit.cpp:203] Token: float
+I0402 16:35:00.233811 13721 TranslationUnit.cpp:203] Token: min_height
+I0402 16:35:00.233814 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233814 13721 TranslationUnit.cpp:203] Token: 0
+I0402 16:35:00.233815 13721 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.233817 13721 TranslationUnit.cpp:203] Token: max_height
+I0402 16:35:00.233819 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233820 13721 TranslationUnit.cpp:203] Token: 10
+I0402 16:35:00.233821 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233822 13721 TranslationUnit.cpp:203] Token: float
+I0402 16:35:00.233824 13721 TranslationUnit.cpp:203] Token: min_intensity
+I0402 16:35:00.233825 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233826 13721 TranslationUnit.cpp:203] Token: 0
+I0402 16:35:00.233829 13721 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.233829 13721 TranslationUnit.cpp:203] Token: max_intensity
+I0402 16:35:00.233831 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233832 13721 TranslationUnit.cpp:203] Token: 255
+I0402 16:35:00.233834 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233835 13721 TranslationUnit.cpp:203] Token: int
+I0402 16:35:00.233836 13721 TranslationUnit.cpp:203] Token: image_width
+I0402 16:35:00.233837 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233839 13721 TranslationUnit.cpp:203] Token: static_cast
+I0402 16:35:00.233840 13721 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.233842 13721 TranslationUnit.cpp:203] Token: int
+I0402 16:35:00.233844 13721 TranslationUnit.cpp:203] Token: >
+I0402 16:35:00.233844 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233846 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233847 13721 TranslationUnit.cpp:203] Token: max_tile_id_x
+I0402 16:35:00.233849 13721 TranslationUnit.cpp:203] Token: -
+I0402 16:35:00.233850 13721 TranslationUnit.cpp:203] Token: min_tile_id_x
+I0402 16:35:00.233851 13721 TranslationUnit.cpp:203] Token: +
+I0402 16:35:00.233853 13721 TranslationUnit.cpp:203] Token: 1
+I0402 16:35:00.233855 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233855 13721 TranslationUnit.cpp:203] Token: *
+I0402 16:35:00.233857 13721 TranslationUnit.cpp:203] Token: param_
+I0402 16:35:00.233858 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233860 13721 TranslationUnit.cpp:203] Token: tile_size
+I0402 16:35:00.233861 13721 TranslationUnit.cpp:203] Token: /
+I0402 16:35:00.233862 13721 TranslationUnit.cpp:203] Token: param_
+I0402 16:35:00.233865 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233865 13721 TranslationUnit.cpp:203] Token: grid_size
+I0402 16:35:00.233866 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233868 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233870 13721 TranslationUnit.cpp:203] Token: int
+I0402 16:35:00.233870 13721 TranslationUnit.cpp:203] Token: image_height
+I0402 16:35:00.233872 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233873 13721 TranslationUnit.cpp:203] Token: static_cast
+I0402 16:35:00.233875 13721 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.233876 13721 TranslationUnit.cpp:203] Token: int
+I0402 16:35:00.233877 13721 TranslationUnit.cpp:203] Token: >
+I0402 16:35:00.233880 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233880 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233881 13721 TranslationUnit.cpp:203] Token: max_tile_id_y
+I0402 16:35:00.233883 13721 TranslationUnit.cpp:203] Token: -
+I0402 16:35:00.233884 13721 TranslationUnit.cpp:203] Token: min_tile_id_y
+I0402 16:35:00.233886 13721 TranslationUnit.cpp:203] Token: +
+I0402 16:35:00.233887 13721 TranslationUnit.cpp:203] Token: 1
+I0402 16:35:00.233888 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233891 13721 TranslationUnit.cpp:203] Token: *
+I0402 16:35:00.233891 13721 TranslationUnit.cpp:203] Token: param_
+I0402 16:35:00.233893 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233894 13721 TranslationUnit.cpp:203] Token: tile_size
+I0402 16:35:00.233898 13721 TranslationUnit.cpp:203] Token: /
+I0402 16:35:00.233899 13721 TranslationUnit.cpp:203] Token: param_
+I0402 16:35:00.233901 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233902 13721 TranslationUnit.cpp:203] Token: grid_size
+I0402 16:35:00.233903 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233906 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233906 13721 TranslationUnit.cpp:203] Token: // make image
+I0402 16:35:00.233908 13721 TranslationUnit.cpp:203] Token: cv
+I0402 16:35:00.233909 13721 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.233911 13721 TranslationUnit.cpp:203] Token: Mat
+I0402 16:35:00.233912 13721 TranslationUnit.cpp:203] Token: blank_image
+I0402 16:35:00.233913 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.233914 13721 TranslationUnit.cpp:203] Token: cv
+I0402 16:35:00.233916 13721 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.233917 13721 TranslationUnit.cpp:203] Token: Mat
+I0402 16:35:00.233919 13721 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.233920 13721 TranslationUnit.cpp:203] Token: zeros
+I0402 16:35:00.233922 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233923 13721 TranslationUnit.cpp:203] Token: image_height
+I0402 16:35:00.233924 13721 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.233925 13721 TranslationUnit.cpp:203] Token: image_width
+I0402 16:35:00.233927 13721 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.233928 13721 TranslationUnit.cpp:203] Token: CV_U8C3
+I0402 16:35:00.233930 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233932 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233932 13721 TranslationUnit.cpp:203] Token: blank_image
+I0402 16:35:00.233934 13721 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.233935 13721 TranslationUnit.cpp:203] Token: copyTo
+I0402 16:35:00.233937 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233938 13721 TranslationUnit.cpp:203] Token: *
+I0402 16:35:00.233939 13721 TranslationUnit.cpp:203] Token: image
+I0402 16:35:00.233942 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233942 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.233943 13721 TranslationUnit.cpp:203] Token: for
+I0402 16:35:00.233945 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233947 13721 TranslationUnit.cpp:203] Token: auto
+I0402 16:35:00.233947 13721 TranslationUnit.cpp:203] Token: grid2_sample
+I0402 16:35:00.233949 13721 TranslationUnit.cpp:203] Token: :
+I0402 16:35:00.233950 13721 TranslationUnit.cpp:203] Token: grid2_samples_
+I0402 16:35:00.233952 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233953 13721 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.233954 13721 TranslationUnit.cpp:203] Token: // set pixel value
+I0402 16:35:00.233956 13721 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.233958 13721 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.233959 13721 TranslationUnit.cpp:203] Token: void
+I0402 16:35:00.233960 13721 TranslationUnit.cpp:203] Token: IntensityMapBuilder
+I0402 16:35:00.233963 13721 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.233963 13721 TranslationUnit.cpp:203] Token: createHeightInfo
+I0402 16:35:00.233964 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233966 13721 TranslationUnit.cpp:203] Token: /* protoBufType *intensity_map_info */
+I0402 16:35:00.233968 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.233969 13721 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.233970 13721 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.233971 13721 TranslationUnit.cpp:203] Token: bool
+I0402 16:35:00.233973 13721 TranslationUnit.cpp:203] Token: IntensityMapBuilder
+I0402 16:35:00.233974 13721 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.233976 13721 TranslationUnit.cpp:203] Token: saveIntensityMap
+I0402 16:35:00.233978 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.233978 13721 TranslationUnit.cpp:203] Token: const
+I0402 16:35:00.233980 13721 TranslationUnit.cpp:203] Token: std
+I0402 16:35:00.233981 13721 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.233986 13721 TranslationUnit.cpp:203] Token: string
+I0402 16:35:00.233989 13721 TranslationUnit.cpp:203] Token: &
+I0402 16:35:00.233989 13721 TranslationUnit.cpp:203] Token: output_folder
+I0402 16:35:00.233990 13721 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.233992 13721 TranslationUnit.cpp:203] Token: const
+I0402 16:35:00.233994 13721 TranslationUnit.cpp:203] Token: cv
+I0402 16:35:00.233994 13721 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.233996 13721 TranslationUnit.cpp:203] Token: Mat
+I0402 16:35:00.233997 13721 TranslationUnit.cpp:203] Token: &
+I0402 16:35:00.233999 13721 TranslationUnit.cpp:203] Token: image
+I0402 16:35:00.234000 13721 TranslationUnit.cpp:203] Token: /*const protoBufType *intensity_map_info */
+I0402 16:35:00.234002 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.234004 13721 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.234004 13721 TranslationUnit.cpp:203] Token: // check or make output folder
+I0402 16:35:00.234006 13721 TranslationUnit.cpp:203] Token: // save image
+I0402 16:35:00.234007 13721 TranslationUnit.cpp:203] Token: std
+I0402 16:35:00.234009 13721 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.234010 13721 TranslationUnit.cpp:203] Token: string
+I0402 16:35:00.234011 13721 TranslationUnit.cpp:203] Token: image_name
+I0402 16:35:00.234014 13721 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.234014 13721 TranslationUnit.cpp:203] Token: output_folder
+I0402 16:35:00.234015 13721 TranslationUnit.cpp:203] Token: +
+I0402 16:35:00.234017 13721 TranslationUnit.cpp:203] Token: "/intensity_image.png"
+I0402 16:35:00.234019 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.234020 13721 TranslationUnit.cpp:203] Token: cv
+I0402 16:35:00.234021 13721 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.234024 13721 TranslationUnit.cpp:203] Token: imwrite
+I0402 16:35:00.234025 13721 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.234025 13721 TranslationUnit.cpp:203] Token: image_name
+I0402 16:35:00.234027 13721 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.234028 13721 TranslationUnit.cpp:203] Token: image
+I0402 16:35:00.234030 13721 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.234031 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.234032 13721 TranslationUnit.cpp:203] Token: // save intensity_map_info
+I0402 16:35:00.234035 13721 TranslationUnit.cpp:203] Token: return
+I0402 16:35:00.234035 13721 TranslationUnit.cpp:203] Token: true
+I0402 16:35:00.234037 13721 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.234038 13721 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.252187 13671 json_parser.cpp:18] 
+[
+	2,
+	{
+		"filename" : "/home/mr/Workspace/loc/src/v2/mapping/src/intensity_map_builder.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-DvtkRenderingVolume_AUTOINIT=\"1(vtkRenderingVolumeOpenGL)\"",
+			"-DvtkIOSQL_AUTOINIT=\"2(vtkIOMySQL,vtkIOPostgreSQL)\"",
+			"-DROS_PACKAGE_NAME=\\\"v2_mapping\\\"",
+			"-isystem",
+			"/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
+			"-DvtkRenderingLIC_AUTOINIT=\"1(vtkRenderingParallelLIC)\"",
+			"-isystem",
+			"/usr/include/x86_64-linux-gnu/qt5",
+			"-Dv2_mapping_EXPORTS",
+			"-DvtkRenderingContext2D_AUTOINIT=\"1(vtkRenderingContextOpenGL)\"",
+			"-I/home/mr/Workspace/loc/src/v2/mapping/map",
+			"-I/usr/lib/openmpi/include",
+			"-I/usr/local/include",
+			"-I/home/mr/Workspace/loc/src/v2/mapping/src",
+			"-DQT_GUI_LIB",
+			"-I/usr/include/tcl",
+			"-Dinertial_nav_EXPORTS",
+			"-I/opt/ros/kinetic/include/opencv-3.3.1-dev",
+			"-I/usr/include/x86_64-linux-gnu/freetype2",
+			"-DvtkIOGeometry_AUTOINIT=\"1(vtkIOMPIParallel)\"",
+			"-DvtkRenderingFreeType_AUTOINIT=\"2(vtkRenderingFreeTypeFontConfig,vtkRenderingMatplotlib)\"",
+			"-DvtkRenderingCore_AUTOINIT=\"4(vtkInteractionStyle,vtkRenderingFreeType,vtkRenderingFreeTypeOpenGL,vtkRenderingOpenGL)\"",
+			"-Dsensor_fusion_EXPORTS",
+			"-I/usr/include/python2.7",
+			"-I/usr/include/vtk-6.2",
+			"-DQT_WIDGETS_LIB",
+			"-I/usr/include/pcl-1.7",
+			"-I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include",
+			"-I/usr/include/freetype2",
+			"-isystem",
+			"/opt/ros/kinetic/include/opencv-3.3.1-dev/opencv",
+			"-DvtkFiltersFlowPaths_AUTOINIT=\"1(vtkFiltersParallelFlowPaths)\"",
+			"-I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent",
+			"-I/usr/include/jsoncpp",
+			"-I/usr/include/ni",
+			"-isystem",
+			"/usr/include/x86_64-linux-gnu/qt5/QtGui",
+			"-DvtkIOImage_AUTOINIT=\"1(vtkIOMPIImage)\"",
+			"-I/home/mr/Workspace/loc/src/v2",
+			"-I/opt/ros/kinetic/include/opencv-3.3.1-dev/opencv",
+			"-I/usr/lib/openmpi/include/openmpi",
+			"-DQT_CORE_LIB",
+			"-I/usr/include/openni2",
+			"-I/home/mr/Workspace/loc/src/v2/build/common/proto",
+			"-I/usr/include/hdf5/openmpi",
+			"-DvtkIOExodus_AUTOINIT=\"1(vtkIOParallelExodus)\"",
+			"-DQT_NO_DEBUG",
+			"-Dcommon_io_EXPORTS",
+			"-I/opt/ros/kinetic/include/xmlrpcpp",
+			"-DROS_PACKAGE_NAME=\\\"common\\\"",
+			"-Dcommon_proto_EXPORTS",
+			"-isystem",
+			"/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64",
+			"-I/usr/include/eigen3",
+			"-I/usr/include/libxml2",
+			"-I/opt/ros/kinetic/include",
+			"-isystem",
+			"/opt/ros/kinetic/include/opencv-3.3.1-dev",
+			"-DDISABLE_PNG",
+			"-DDISABLE_PCAP",
+			"-isystem",
+			"/usr/include/x86_64-linux-gnu/qt5/QtCore",
+			"-DROS_PACKAGE_NAME=\\\"localization\\\"",
+			"-Dcommon_geometry_EXPORTS",
+			"-I/usr/include/x86_64-linux-gnu",
+			"-I/home/mr/Workspace/loc/src/v2/third_party/thread_pool",
+			"-DROSCONSOLE_BACKEND_LOG4CXX",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "// Copyright 2019 Allride.ai. All rights reserved.\n// Authors: Yongjian Zhao (yongjian.zhao@allride.ai)\n\n#include <priority_queue>\n#include <set>\n\n#include \"intensity_map_builder.h\"\n\nvoid ClusterSample::ClusterSample(const ClusterSmaple& other) {\n  this->point_num += other.point_num;\n\n  float other_weight = static_cast<float>(other.point_num) / this->point_num;\n  float this_weight = 1.0f - other_weight;\n\n  this->height = this_weight * this->height + other_weight * other.height;\n  this->intensity = this_weigh * this->intensity + other_weight * other.intensity;\n}\n\nvoid IntensityMapBuilder::buildIntensityMap(const std::string& output_folder) {\n  // To initialize grid2_samples_, each ndt3 grid is one ClusterSample\n  // for each grid2 sample, there are several Cluster\n\n  // height cluster for each grid2_sample\n  for (auto& grid2_smaple : grid2_samples_) {\n    heightCluster(&grid2_smaple.second);\n  }\n\n  // create image acoording to grid2_samples_\n  cv::Mat intensity_image;\n  createImage(&intensity_image);\n\n  // create intensity_map_info according to grid2_samples_\n  /* protoBufType intensity_map_info */\n  createHeightInfo(/*&intensity_map_info*/);\n\n  // save image and intensity_map_info\n  saveIntensityMap(output_folder, intensity_image /*, intensity_map_info*/);\n}\n\nvoid IntensityMapBuilder::heightCluster(std::vector<ClusterSample>* samples) {\n  size_t sample_num = samples->size();\n\n  // make existing_sample_id\n  std::set<size_t> existing_sample_id;\n  for (size_t i = 0; i < sample_num; i++) {\n    existing_sample_id.insert(i);\n  }\n\n  // make distance_queue\n  std::priority_queue<QueueElement, std::vector<QueueElement>, QueueElementCompare> distance_queue;\n  for (size_t i = 0; i < sample_num; i++) {\n    for (size_t j = i + 1; j < sample_num; j++) {\n      float distance = fabs(samples->at(i).height - samples->at(j).height);\n      distance_queue.emplace(distance, i, j);\n    }\n  }\n\n  // cluster\n  const float distance_th = 4.0f;\n  while (true) {\n    // find min_distance between each ClusterSample\n    QueueElement element = distance_queue.top() distance_queue.pop();\n    if (element.distance > distance_th) {\n      break;\n    }\n\n    if (existing_sample_id.count(element.small_id) == 0) {\n      continue;\n    }\n\n    if (existing_sample_id.count(element.big_id) == 0) {\n      continue;\n    }\n\n    // merge two nearest samples\n    samples->at(element.small_id).merge(samples->at(element.big_id));\n    existing_sample_id.erase(element.big_id);\n    sample_num--;\n  }\n\n  if (existing_sample_id.size() != sample_num) {\n    std::cout << \"error: existing_sample_id.size() does not equal to sample_num!\" << std::endl;\n  }\n\n  // save cluster result\n  // need test\n  size_t i = 0;\n  for (size_t id& existing_sample_id) {\n    samples->at<i> = samples->at(id);\n  }\n  samples->resize(sample_num);\n}\n\nvoid IntensityMapBuilder::createImage(cv::Mat* image) {\n  // get necessary information from ndt_map_data_\n  int min_tile_id_x = 0, max_tile_id_x = 10;\n  int min_tile_id_y = 0, max_tile_id_y = 10;\n  float min_height = 0, max_height = 10;\n  float min_intensity = 0, max_intensity = 255;\n\n  int image_width =\n      static_cast<int>((max_tile_id_x - min_tile_id_x + 1) * param_.tile_size / param_.grid_size);\n  int image_height =\n      static_cast<int>((max_tile_id_y - min_tile_id_y + 1) * param_.tile_size / param_.grid_size);\n\n  // make image\n  cv::Mat blank_image = cv::Mat::zeros(image_height, image_width, CV_U8C3);\n  blank_image.copyTo(*image);\n  for (auto grid2_sample : grid2_samples_) {\n    // set pixel value\n  }\n}\n\nvoid IntensityMapBuilder::createHeightInfo(/* protoBufType *intensity_map_info */) {}\n\nbool IntensityMapBuilder::saveIntensityMap(const std::string& output_folder, const cv::Mat& image\n                                           /*const protoBufType *intensity_map_info */) {\n  // check or make output folder\n\n  // save image\n  std::string image_name = output_folder + \"/intensity_image.png\";\n  cv::imwrite(image_name, image);\n\n  // save intensity_map_info\n\n  return true;\n}\n",
+			"filename" : "/home/mr/Workspace/loc/src/v2/mapping/src/intensity_map_builder.cpp"
+		}
+	}
+]
+I0402 16:35:00.260579 13729 TranslationUnit.cpp:182] token number: 657
+I0402 16:35:00.260717 13729 TranslationUnit.cpp:203] Token: // Copyright 2019 Allride.ai. All rights reserved.
+I0402 16:35:00.260721 13729 TranslationUnit.cpp:203] Token: // Authors: Yongjian Zhao (yongjian.zhao@allride.ai)
+I0402 16:35:00.260723 13729 TranslationUnit.cpp:203] Token: #
+I0402 16:35:00.260725 13729 TranslationUnit.cpp:203] Token: include
+I0402 16:35:00.260726 13729 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.260727 13729 TranslationUnit.cpp:203] Token: priority_queue
+I0402 16:35:00.260730 13729 TranslationUnit.cpp:203] Token: >
+I0402 16:35:00.260730 13729 TranslationUnit.cpp:203] Token: #
+I0402 16:35:00.260732 13729 TranslationUnit.cpp:203] Token: include
+I0402 16:35:00.260733 13729 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.260735 13729 TranslationUnit.cpp:203] Token: set
+I0402 16:35:00.260736 13729 TranslationUnit.cpp:203] Token: >
+I0402 16:35:00.260737 13729 TranslationUnit.cpp:203] Token: #
+I0402 16:35:00.260740 13729 TranslationUnit.cpp:203] Token: include
+I0402 16:35:00.260740 13729 TranslationUnit.cpp:203] Token: "intensity_map_builder.h"
+I0402 16:35:00.260742 13729 TranslationUnit.cpp:203] Token: void
+I0402 16:35:00.260743 13729 TranslationUnit.cpp:203] Token: ClusterSample
+I0402 16:35:00.260746 13729 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.260746 13729 TranslationUnit.cpp:203] Token: ClusterSample
+I0402 16:35:00.260748 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.260749 13729 TranslationUnit.cpp:203] Token: const
+I0402 16:35:00.260751 13729 TranslationUnit.cpp:203] Token: ClusterSmaple
+I0402 16:35:00.260752 13729 TranslationUnit.cpp:203] Token: &
+I0402 16:35:00.260753 13729 TranslationUnit.cpp:203] Token: other
+I0402 16:35:00.260756 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.260756 13729 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.260757 13729 TranslationUnit.cpp:203] Token: this
+I0402 16:35:00.260759 13729 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.260761 13729 TranslationUnit.cpp:203] Token: point_num
+I0402 16:35:00.260762 13729 TranslationUnit.cpp:203] Token: +=
+I0402 16:35:00.260763 13729 TranslationUnit.cpp:203] Token: other
+I0402 16:35:00.260764 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.260766 13729 TranslationUnit.cpp:203] Token: point_num
+I0402 16:35:00.260776 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.260778 13729 TranslationUnit.cpp:203] Token: float
+I0402 16:35:00.260780 13729 TranslationUnit.cpp:203] Token: other_weight
+I0402 16:35:00.260782 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.260782 13729 TranslationUnit.cpp:203] Token: static_cast
+I0402 16:35:00.260784 13729 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.260785 13729 TranslationUnit.cpp:203] Token: float
+I0402 16:35:00.260787 13729 TranslationUnit.cpp:203] Token: >
+I0402 16:35:00.260788 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.260789 13729 TranslationUnit.cpp:203] Token: other
+I0402 16:35:00.260792 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.260792 13729 TranslationUnit.cpp:203] Token: point_num
+I0402 16:35:00.260793 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.260795 13729 TranslationUnit.cpp:203] Token: /
+I0402 16:35:00.260797 13729 TranslationUnit.cpp:203] Token: this
+I0402 16:35:00.260798 13729 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.260799 13729 TranslationUnit.cpp:203] Token: point_num
+I0402 16:35:00.260800 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.260802 13729 TranslationUnit.cpp:203] Token: float
+I0402 16:35:00.260803 13729 TranslationUnit.cpp:203] Token: this_weight
+I0402 16:35:00.260804 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.260807 13729 TranslationUnit.cpp:203] Token: 1.0f
+I0402 16:35:00.260807 13729 TranslationUnit.cpp:203] Token: -
+I0402 16:35:00.260808 13729 TranslationUnit.cpp:203] Token: other_weight
+I0402 16:35:00.260810 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.260812 13729 TranslationUnit.cpp:203] Token: this
+I0402 16:35:00.260813 13729 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.260814 13729 TranslationUnit.cpp:203] Token: height
+I0402 16:35:00.260815 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.260818 13729 TranslationUnit.cpp:203] Token: this_weight
+I0402 16:35:00.260818 13729 TranslationUnit.cpp:203] Token: *
+I0402 16:35:00.260819 13729 TranslationUnit.cpp:203] Token: this
+I0402 16:35:00.260821 13729 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.260823 13729 TranslationUnit.cpp:203] Token: height
+I0402 16:35:00.260824 13729 TranslationUnit.cpp:203] Token: +
+I0402 16:35:00.260825 13729 TranslationUnit.cpp:203] Token: other_weight
+I0402 16:35:00.260826 13729 TranslationUnit.cpp:203] Token: *
+I0402 16:35:00.260828 13729 TranslationUnit.cpp:203] Token: other
+I0402 16:35:00.260829 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.260830 13729 TranslationUnit.cpp:203] Token: height
+I0402 16:35:00.260833 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.260833 13729 TranslationUnit.cpp:203] Token: this
+I0402 16:35:00.260834 13729 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.260836 13729 TranslationUnit.cpp:203] Token: intensity
+I0402 16:35:00.260838 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.260838 13729 TranslationUnit.cpp:203] Token: this_weigh
+I0402 16:35:00.260840 13729 TranslationUnit.cpp:203] Token: *
+I0402 16:35:00.260841 13729 TranslationUnit.cpp:203] Token: this
+I0402 16:35:00.260843 13729 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.260844 13729 TranslationUnit.cpp:203] Token: intensity
+I0402 16:35:00.260845 13729 TranslationUnit.cpp:203] Token: +
+I0402 16:35:00.260848 13729 TranslationUnit.cpp:203] Token: other_weight
+I0402 16:35:00.260848 13729 TranslationUnit.cpp:203] Token: *
+I0402 16:35:00.260849 13729 TranslationUnit.cpp:203] Token: other
+I0402 16:35:00.260851 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.260852 13729 TranslationUnit.cpp:203] Token: intensity
+I0402 16:35:00.260854 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.260855 13729 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.260856 13729 TranslationUnit.cpp:203] Token: void
+I0402 16:35:00.260859 13729 TranslationUnit.cpp:203] Token: IntensityMapBuilder
+I0402 16:35:00.260859 13729 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.260860 13729 TranslationUnit.cpp:203] Token: buildIntensityMap
+I0402 16:35:00.260865 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.260867 13729 TranslationUnit.cpp:203] Token: const
+I0402 16:35:00.260869 13729 TranslationUnit.cpp:203] Token: std
+I0402 16:35:00.260869 13729 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.260871 13729 TranslationUnit.cpp:203] Token: string
+I0402 16:35:00.260872 13729 TranslationUnit.cpp:203] Token: &
+I0402 16:35:00.260874 13729 TranslationUnit.cpp:203] Token: output_folder
+I0402 16:35:00.260875 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.260876 13729 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.260879 13729 TranslationUnit.cpp:203] Token: // To initialize grid2_samples_, each ndt3 grid is one ClusterSample
+I0402 16:35:00.260880 13729 TranslationUnit.cpp:203] Token: // for each grid2 sample, there are several Cluster
+I0402 16:35:00.260881 13729 TranslationUnit.cpp:203] Token: // height cluster for each grid2_sample
+I0402 16:35:00.260884 13729 TranslationUnit.cpp:203] Token: for
+I0402 16:35:00.260885 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.260886 13729 TranslationUnit.cpp:203] Token: auto
+I0402 16:35:00.260887 13729 TranslationUnit.cpp:203] Token: &
+I0402 16:35:00.260888 13729 TranslationUnit.cpp:203] Token: grid2_smaple
+I0402 16:35:00.260890 13729 TranslationUnit.cpp:203] Token: :
+I0402 16:35:00.260891 13729 TranslationUnit.cpp:203] Token: grid2_samples_
+I0402 16:35:00.260893 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.260895 13729 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.260895 13729 TranslationUnit.cpp:203] Token: heightCluster
+I0402 16:35:00.260897 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.260898 13729 TranslationUnit.cpp:203] Token: &
+I0402 16:35:00.260900 13729 TranslationUnit.cpp:203] Token: grid2_smaple
+I0402 16:35:00.260901 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.260902 13729 TranslationUnit.cpp:203] Token: second
+I0402 16:35:00.260905 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.260905 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.260907 13729 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.260908 13729 TranslationUnit.cpp:203] Token: // create image acoording to grid2_samples_
+I0402 16:35:00.260910 13729 TranslationUnit.cpp:203] Token: cv
+I0402 16:35:00.260911 13729 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.260912 13729 TranslationUnit.cpp:203] Token: Mat
+I0402 16:35:00.260915 13729 TranslationUnit.cpp:203] Token: intensity_image
+I0402 16:35:00.260915 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.260916 13729 TranslationUnit.cpp:203] Token: createImage
+I0402 16:35:00.260918 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.260920 13729 TranslationUnit.cpp:203] Token: &
+I0402 16:35:00.260921 13729 TranslationUnit.cpp:203] Token: intensity_image
+I0402 16:35:00.260922 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.260923 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.260926 13729 TranslationUnit.cpp:203] Token: // create intensity_map_info according to grid2_samples_
+I0402 16:35:00.260927 13729 TranslationUnit.cpp:203] Token: /* protoBufType intensity_map_info */
+I0402 16:35:00.260928 13729 TranslationUnit.cpp:203] Token: createHeightInfo
+I0402 16:35:00.260931 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.260931 13729 TranslationUnit.cpp:203] Token: /*&intensity_map_info*/
+I0402 16:35:00.260933 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.260934 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.260936 13729 TranslationUnit.cpp:203] Token: // save image and intensity_map_info
+I0402 16:35:00.260937 13729 TranslationUnit.cpp:203] Token: saveIntensityMap
+I0402 16:35:00.260939 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.260941 13729 TranslationUnit.cpp:203] Token: output_folder
+I0402 16:35:00.260941 13729 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.260943 13729 TranslationUnit.cpp:203] Token: intensity_image
+I0402 16:35:00.260944 13729 TranslationUnit.cpp:203] Token: /*, intensity_map_info*/
+I0402 16:35:00.260946 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.260947 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.260951 13729 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.260953 13729 TranslationUnit.cpp:203] Token: void
+I0402 16:35:00.260954 13729 TranslationUnit.cpp:203] Token: IntensityMapBuilder
+I0402 16:35:00.260957 13729 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.260957 13729 TranslationUnit.cpp:203] Token: heightCluster
+I0402 16:35:00.260959 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.260960 13729 TranslationUnit.cpp:203] Token: std
+I0402 16:35:00.260962 13729 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.260963 13729 TranslationUnit.cpp:203] Token: vector
+I0402 16:35:00.260964 13729 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.260965 13729 TranslationUnit.cpp:203] Token: ClusterSample
+I0402 16:35:00.260967 13729 TranslationUnit.cpp:203] Token: >
+I0402 16:35:00.260968 13729 TranslationUnit.cpp:203] Token: *
+I0402 16:35:00.260970 13729 TranslationUnit.cpp:203] Token: samples
+I0402 16:35:00.260972 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.260972 13729 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.260974 13729 TranslationUnit.cpp:203] Token: size_t
+I0402 16:35:00.260975 13729 TranslationUnit.cpp:203] Token: sample_num
+I0402 16:35:00.260977 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.260978 13729 TranslationUnit.cpp:203] Token: samples
+I0402 16:35:00.260979 13729 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.260982 13729 TranslationUnit.cpp:203] Token: size
+I0402 16:35:00.260982 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.260984 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.260985 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.260987 13729 TranslationUnit.cpp:203] Token: // make existing_sample_id
+I0402 16:35:00.260988 13729 TranslationUnit.cpp:203] Token: std
+I0402 16:35:00.260989 13729 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.260991 13729 TranslationUnit.cpp:203] Token: set
+I0402 16:35:00.260993 13729 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.260993 13729 TranslationUnit.cpp:203] Token: size_t
+I0402 16:35:00.260995 13729 TranslationUnit.cpp:203] Token: >
+I0402 16:35:00.260996 13729 TranslationUnit.cpp:203] Token: existing_sample_id
+I0402 16:35:00.260998 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.260999 13729 TranslationUnit.cpp:203] Token: for
+I0402 16:35:00.261000 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261003 13729 TranslationUnit.cpp:203] Token: size_t
+I0402 16:35:00.261003 13729 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.261005 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.261006 13729 TranslationUnit.cpp:203] Token: 0
+I0402 16:35:00.261008 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261009 13729 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.261010 13729 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.261013 13729 TranslationUnit.cpp:203] Token: sample_num
+I0402 16:35:00.261013 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261014 13729 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.261016 13729 TranslationUnit.cpp:203] Token: ++
+I0402 16:35:00.261018 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261019 13729 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.261020 13729 TranslationUnit.cpp:203] Token: existing_sample_id
+I0402 16:35:00.261021 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.261023 13729 TranslationUnit.cpp:203] Token: insert
+I0402 16:35:00.261024 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261025 13729 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.261027 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261029 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261030 13729 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.261031 13729 TranslationUnit.cpp:203] Token: // make distance_queue
+I0402 16:35:00.261034 13729 TranslationUnit.cpp:203] Token: std
+I0402 16:35:00.261034 13729 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.261035 13729 TranslationUnit.cpp:203] Token: priority_queue
+I0402 16:35:00.261037 13729 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.261041 13729 TranslationUnit.cpp:203] Token: QueueElement
+I0402 16:35:00.261042 13729 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.261044 13729 TranslationUnit.cpp:203] Token: std
+I0402 16:35:00.261045 13729 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.261046 13729 TranslationUnit.cpp:203] Token: vector
+I0402 16:35:00.261049 13729 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.261049 13729 TranslationUnit.cpp:203] Token: QueueElement
+I0402 16:35:00.261051 13729 TranslationUnit.cpp:203] Token: >
+I0402 16:35:00.261052 13729 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.261054 13729 TranslationUnit.cpp:203] Token: QueueElementCompare
+I0402 16:35:00.261055 13729 TranslationUnit.cpp:203] Token: >
+I0402 16:35:00.261056 13729 TranslationUnit.cpp:203] Token: distance_queue
+I0402 16:35:00.261059 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261059 13729 TranslationUnit.cpp:203] Token: for
+I0402 16:35:00.261060 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261062 13729 TranslationUnit.cpp:203] Token: size_t
+I0402 16:35:00.261063 13729 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.261065 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.261066 13729 TranslationUnit.cpp:203] Token: 0
+I0402 16:35:00.261067 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261070 13729 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.261070 13729 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.261071 13729 TranslationUnit.cpp:203] Token: sample_num
+I0402 16:35:00.261073 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261075 13729 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.261075 13729 TranslationUnit.cpp:203] Token: ++
+I0402 16:35:00.261077 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261078 13729 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.261080 13729 TranslationUnit.cpp:203] Token: for
+I0402 16:35:00.261081 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261082 13729 TranslationUnit.cpp:203] Token: size_t
+I0402 16:35:00.261085 13729 TranslationUnit.cpp:203] Token: j
+I0402 16:35:00.261085 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.261086 13729 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.261088 13729 TranslationUnit.cpp:203] Token: +
+I0402 16:35:00.261090 13729 TranslationUnit.cpp:203] Token: 1
+I0402 16:35:00.261091 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261092 13729 TranslationUnit.cpp:203] Token: j
+I0402 16:35:00.261093 13729 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.261096 13729 TranslationUnit.cpp:203] Token: sample_num
+I0402 16:35:00.261096 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261097 13729 TranslationUnit.cpp:203] Token: j
+I0402 16:35:00.261099 13729 TranslationUnit.cpp:203] Token: ++
+I0402 16:35:00.261101 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261102 13729 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.261103 13729 TranslationUnit.cpp:203] Token: float
+I0402 16:35:00.261104 13729 TranslationUnit.cpp:203] Token: distance
+I0402 16:35:00.261106 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.261107 13729 TranslationUnit.cpp:203] Token: fabs
+I0402 16:35:00.261109 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261111 13729 TranslationUnit.cpp:203] Token: samples
+I0402 16:35:00.261111 13729 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.261113 13729 TranslationUnit.cpp:203] Token: at
+I0402 16:35:00.261114 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261116 13729 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.261117 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261118 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.261121 13729 TranslationUnit.cpp:203] Token: height
+I0402 16:35:00.261121 13729 TranslationUnit.cpp:203] Token: -
+I0402 16:35:00.261122 13729 TranslationUnit.cpp:203] Token: samples
+I0402 16:35:00.261124 13729 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.261126 13729 TranslationUnit.cpp:203] Token: at
+I0402 16:35:00.261126 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261128 13729 TranslationUnit.cpp:203] Token: j
+I0402 16:35:00.261132 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261134 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.261135 13729 TranslationUnit.cpp:203] Token: height
+I0402 16:35:00.261137 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261138 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261139 13729 TranslationUnit.cpp:203] Token: distance_queue
+I0402 16:35:00.261142 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.261142 13729 TranslationUnit.cpp:203] Token: emplace
+I0402 16:35:00.261143 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261145 13729 TranslationUnit.cpp:203] Token: distance
+I0402 16:35:00.261147 13729 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.261147 13729 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.261149 13729 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.261150 13729 TranslationUnit.cpp:203] Token: j
+I0402 16:35:00.261152 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261153 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261154 13729 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.261157 13729 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.261157 13729 TranslationUnit.cpp:203] Token: // cluster
+I0402 16:35:00.261159 13729 TranslationUnit.cpp:203] Token: const
+I0402 16:35:00.261160 13729 TranslationUnit.cpp:203] Token: float
+I0402 16:35:00.261162 13729 TranslationUnit.cpp:203] Token: distance_th
+I0402 16:35:00.261163 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.261164 13729 TranslationUnit.cpp:203] Token: 4.0f
+I0402 16:35:00.261165 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261168 13729 TranslationUnit.cpp:203] Token: while
+I0402 16:35:00.261168 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261170 13729 TranslationUnit.cpp:203] Token: true
+I0402 16:35:00.261171 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261173 13729 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.261174 13729 TranslationUnit.cpp:203] Token: // find min_distance between each ClusterSample
+I0402 16:35:00.261175 13729 TranslationUnit.cpp:203] Token: QueueElement
+I0402 16:35:00.261178 13729 TranslationUnit.cpp:203] Token: element
+I0402 16:35:00.261178 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.261180 13729 TranslationUnit.cpp:203] Token: distance_queue
+I0402 16:35:00.261181 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.261183 13729 TranslationUnit.cpp:203] Token: top
+I0402 16:35:00.261184 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261185 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261186 13729 TranslationUnit.cpp:203] Token: distance_queue
+I0402 16:35:00.261188 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.261189 13729 TranslationUnit.cpp:203] Token: pop
+I0402 16:35:00.261191 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261193 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261193 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261195 13729 TranslationUnit.cpp:203] Token: if
+I0402 16:35:00.261196 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261198 13729 TranslationUnit.cpp:203] Token: element
+I0402 16:35:00.261199 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.261200 13729 TranslationUnit.cpp:203] Token: distance
+I0402 16:35:00.261202 13729 TranslationUnit.cpp:203] Token: >
+I0402 16:35:00.261204 13729 TranslationUnit.cpp:203] Token: distance_th
+I0402 16:35:00.261204 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261206 13729 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.261207 13729 TranslationUnit.cpp:203] Token: break
+I0402 16:35:00.261209 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261210 13729 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.261211 13729 TranslationUnit.cpp:203] Token: if
+I0402 16:35:00.261214 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261214 13729 TranslationUnit.cpp:203] Token: existing_sample_id
+I0402 16:35:00.261216 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.261217 13729 TranslationUnit.cpp:203] Token: count
+I0402 16:35:00.261219 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261222 13729 TranslationUnit.cpp:203] Token: element
+I0402 16:35:00.261224 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.261225 13729 TranslationUnit.cpp:203] Token: small_id
+I0402 16:35:00.261227 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261229 13729 TranslationUnit.cpp:203] Token: ==
+I0402 16:35:00.261230 13729 TranslationUnit.cpp:203] Token: 0
+I0402 16:35:00.261231 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261232 13729 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.261234 13729 TranslationUnit.cpp:203] Token: continue
+I0402 16:35:00.261235 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261237 13729 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.261238 13729 TranslationUnit.cpp:203] Token: if
+I0402 16:35:00.261240 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261241 13729 TranslationUnit.cpp:203] Token: existing_sample_id
+I0402 16:35:00.261242 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.261243 13729 TranslationUnit.cpp:203] Token: count
+I0402 16:35:00.261245 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261246 13729 TranslationUnit.cpp:203] Token: element
+I0402 16:35:00.261248 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.261250 13729 TranslationUnit.cpp:203] Token: big_id
+I0402 16:35:00.261250 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261252 13729 TranslationUnit.cpp:203] Token: ==
+I0402 16:35:00.261253 13729 TranslationUnit.cpp:203] Token: 0
+I0402 16:35:00.261255 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261256 13729 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.261257 13729 TranslationUnit.cpp:203] Token: continue
+I0402 16:35:00.261260 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261260 13729 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.261262 13729 TranslationUnit.cpp:203] Token: // merge two nearest samples
+I0402 16:35:00.261263 13729 TranslationUnit.cpp:203] Token: samples
+I0402 16:35:00.261265 13729 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.261266 13729 TranslationUnit.cpp:203] Token: at
+I0402 16:35:00.261267 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261270 13729 TranslationUnit.cpp:203] Token: element
+I0402 16:35:00.261270 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.261271 13729 TranslationUnit.cpp:203] Token: small_id
+I0402 16:35:00.261273 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261274 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.261276 13729 TranslationUnit.cpp:203] Token: merge
+I0402 16:35:00.261277 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261278 13729 TranslationUnit.cpp:203] Token: samples
+I0402 16:35:00.261281 13729 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.261281 13729 TranslationUnit.cpp:203] Token: at
+I0402 16:35:00.261283 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261284 13729 TranslationUnit.cpp:203] Token: element
+I0402 16:35:00.261286 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.261287 13729 TranslationUnit.cpp:203] Token: big_id
+I0402 16:35:00.261288 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261289 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261291 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261292 13729 TranslationUnit.cpp:203] Token: existing_sample_id
+I0402 16:35:00.261294 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.261296 13729 TranslationUnit.cpp:203] Token: erase
+I0402 16:35:00.261296 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261298 13729 TranslationUnit.cpp:203] Token: element
+I0402 16:35:00.261299 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.261301 13729 TranslationUnit.cpp:203] Token: big_id
+I0402 16:35:00.261302 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261303 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261306 13729 TranslationUnit.cpp:203] Token: sample_num
+I0402 16:35:00.261307 13729 TranslationUnit.cpp:203] Token: --
+I0402 16:35:00.261307 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261309 13729 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.261313 13729 TranslationUnit.cpp:203] Token: if
+I0402 16:35:00.261314 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261317 13729 TranslationUnit.cpp:203] Token: existing_sample_id
+I0402 16:35:00.261317 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.261319 13729 TranslationUnit.cpp:203] Token: size
+I0402 16:35:00.261320 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261322 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261323 13729 TranslationUnit.cpp:203] Token: !=
+I0402 16:35:00.261324 13729 TranslationUnit.cpp:203] Token: sample_num
+I0402 16:35:00.261327 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261327 13729 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.261328 13729 TranslationUnit.cpp:203] Token: std
+I0402 16:35:00.261330 13729 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.261332 13729 TranslationUnit.cpp:203] Token: cout
+I0402 16:35:00.261333 13729 TranslationUnit.cpp:203] Token: <<
+I0402 16:35:00.261334 13729 TranslationUnit.cpp:203] Token: "error: existing_sample_id.size() does not equal to sample_num!"
+I0402 16:35:00.261337 13729 TranslationUnit.cpp:203] Token: <<
+I0402 16:35:00.261337 13729 TranslationUnit.cpp:203] Token: std
+I0402 16:35:00.261338 13729 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.261340 13729 TranslationUnit.cpp:203] Token: endl
+I0402 16:35:00.261342 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261343 13729 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.261344 13729 TranslationUnit.cpp:203] Token: // save cluster result
+I0402 16:35:00.261346 13729 TranslationUnit.cpp:203] Token: // need test
+I0402 16:35:00.261348 13729 TranslationUnit.cpp:203] Token: size_t
+I0402 16:35:00.261348 13729 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.261350 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.261351 13729 TranslationUnit.cpp:203] Token: 0
+I0402 16:35:00.261353 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261354 13729 TranslationUnit.cpp:203] Token: for
+I0402 16:35:00.261355 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261358 13729 TranslationUnit.cpp:203] Token: size_t
+I0402 16:35:00.261358 13729 TranslationUnit.cpp:203] Token: id
+I0402 16:35:00.261359 13729 TranslationUnit.cpp:203] Token: &
+I0402 16:35:00.261361 13729 TranslationUnit.cpp:203] Token: existing_sample_id
+I0402 16:35:00.261363 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261364 13729 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.261365 13729 TranslationUnit.cpp:203] Token: samples
+I0402 16:35:00.261366 13729 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.261368 13729 TranslationUnit.cpp:203] Token: at
+I0402 16:35:00.261369 13729 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.261370 13729 TranslationUnit.cpp:203] Token: i
+I0402 16:35:00.261373 13729 TranslationUnit.cpp:203] Token: >
+I0402 16:35:00.261373 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.261375 13729 TranslationUnit.cpp:203] Token: samples
+I0402 16:35:00.261376 13729 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.261377 13729 TranslationUnit.cpp:203] Token: at
+I0402 16:35:00.261379 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261380 13729 TranslationUnit.cpp:203] Token: id
+I0402 16:35:00.261381 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261384 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261384 13729 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.261386 13729 TranslationUnit.cpp:203] Token: samples
+I0402 16:35:00.261387 13729 TranslationUnit.cpp:203] Token: ->
+I0402 16:35:00.261389 13729 TranslationUnit.cpp:203] Token: resize
+I0402 16:35:00.261390 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261391 13729 TranslationUnit.cpp:203] Token: sample_num
+I0402 16:35:00.261392 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261394 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261395 13729 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.261397 13729 TranslationUnit.cpp:203] Token: void
+I0402 16:35:00.261399 13729 TranslationUnit.cpp:203] Token: IntensityMapBuilder
+I0402 16:35:00.261400 13729 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.261404 13729 TranslationUnit.cpp:203] Token: createImage
+I0402 16:35:00.261406 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261407 13729 TranslationUnit.cpp:203] Token: cv
+I0402 16:35:00.261409 13729 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.261410 13729 TranslationUnit.cpp:203] Token: Mat
+I0402 16:35:00.261412 13729 TranslationUnit.cpp:203] Token: *
+I0402 16:35:00.261413 13729 TranslationUnit.cpp:203] Token: image
+I0402 16:35:00.261415 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261416 13729 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.261417 13729 TranslationUnit.cpp:203] Token: // get necessary information from ndt_map_data_
+I0402 16:35:00.261420 13729 TranslationUnit.cpp:203] Token: int
+I0402 16:35:00.261420 13729 TranslationUnit.cpp:203] Token: min_tile_id_x
+I0402 16:35:00.261421 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.261423 13729 TranslationUnit.cpp:203] Token: 0
+I0402 16:35:00.261425 13729 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.261426 13729 TranslationUnit.cpp:203] Token: max_tile_id_x
+I0402 16:35:00.261427 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.261428 13729 TranslationUnit.cpp:203] Token: 10
+I0402 16:35:00.261430 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261431 13729 TranslationUnit.cpp:203] Token: int
+I0402 16:35:00.261433 13729 TranslationUnit.cpp:203] Token: min_tile_id_y
+I0402 16:35:00.261435 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.261435 13729 TranslationUnit.cpp:203] Token: 0
+I0402 16:35:00.261437 13729 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.261438 13729 TranslationUnit.cpp:203] Token: max_tile_id_y
+I0402 16:35:00.261440 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.261441 13729 TranslationUnit.cpp:203] Token: 10
+I0402 16:35:00.261442 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261445 13729 TranslationUnit.cpp:203] Token: float
+I0402 16:35:00.261445 13729 TranslationUnit.cpp:203] Token: min_height
+I0402 16:35:00.261446 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.261448 13729 TranslationUnit.cpp:203] Token: 0
+I0402 16:35:00.261449 13729 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.261451 13729 TranslationUnit.cpp:203] Token: max_height
+I0402 16:35:00.261452 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.261453 13729 TranslationUnit.cpp:203] Token: 10
+I0402 16:35:00.261456 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261456 13729 TranslationUnit.cpp:203] Token: float
+I0402 16:35:00.261457 13729 TranslationUnit.cpp:203] Token: min_intensity
+I0402 16:35:00.261459 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.261461 13729 TranslationUnit.cpp:203] Token: 0
+I0402 16:35:00.261462 13729 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.261463 13729 TranslationUnit.cpp:203] Token: max_intensity
+I0402 16:35:00.261464 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.261466 13729 TranslationUnit.cpp:203] Token: 255
+I0402 16:35:00.261467 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261469 13729 TranslationUnit.cpp:203] Token: int
+I0402 16:35:00.261471 13729 TranslationUnit.cpp:203] Token: image_width
+I0402 16:35:00.261471 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.261473 13729 TranslationUnit.cpp:203] Token: static_cast
+I0402 16:35:00.261474 13729 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.261476 13729 TranslationUnit.cpp:203] Token: int
+I0402 16:35:00.261477 13729 TranslationUnit.cpp:203] Token: >
+I0402 16:35:00.261478 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261481 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261482 13729 TranslationUnit.cpp:203] Token: max_tile_id_x
+I0402 16:35:00.261482 13729 TranslationUnit.cpp:203] Token: -
+I0402 16:35:00.261484 13729 TranslationUnit.cpp:203] Token: min_tile_id_x
+I0402 16:35:00.261485 13729 TranslationUnit.cpp:203] Token: +
+I0402 16:35:00.261487 13729 TranslationUnit.cpp:203] Token: 1
+I0402 16:35:00.261488 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261489 13729 TranslationUnit.cpp:203] Token: *
+I0402 16:35:00.261494 13729 TranslationUnit.cpp:203] Token: param_
+I0402 16:35:00.261495 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.261497 13729 TranslationUnit.cpp:203] Token: tile_size
+I0402 16:35:00.261498 13729 TranslationUnit.cpp:203] Token: /
+I0402 16:35:00.261499 13729 TranslationUnit.cpp:203] Token: param_
+I0402 16:35:00.261502 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.261502 13729 TranslationUnit.cpp:203] Token: grid_size
+I0402 16:35:00.261503 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261505 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261507 13729 TranslationUnit.cpp:203] Token: int
+I0402 16:35:00.261508 13729 TranslationUnit.cpp:203] Token: image_height
+I0402 16:35:00.261509 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.261510 13729 TranslationUnit.cpp:203] Token: static_cast
+I0402 16:35:00.261512 13729 TranslationUnit.cpp:203] Token: <
+I0402 16:35:00.261513 13729 TranslationUnit.cpp:203] Token: int
+I0402 16:35:00.261514 13729 TranslationUnit.cpp:203] Token: >
+I0402 16:35:00.261517 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261518 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261519 13729 TranslationUnit.cpp:203] Token: max_tile_id_y
+I0402 16:35:00.261520 13729 TranslationUnit.cpp:203] Token: -
+I0402 16:35:00.261521 13729 TranslationUnit.cpp:203] Token: min_tile_id_y
+I0402 16:35:00.261523 13729 TranslationUnit.cpp:203] Token: +
+I0402 16:35:00.261524 13729 TranslationUnit.cpp:203] Token: 1
+I0402 16:35:00.261526 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261528 13729 TranslationUnit.cpp:203] Token: *
+I0402 16:35:00.261528 13729 TranslationUnit.cpp:203] Token: param_
+I0402 16:35:00.261530 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.261531 13729 TranslationUnit.cpp:203] Token: tile_size
+I0402 16:35:00.261533 13729 TranslationUnit.cpp:203] Token: /
+I0402 16:35:00.261534 13729 TranslationUnit.cpp:203] Token: param_
+I0402 16:35:00.261535 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.261538 13729 TranslationUnit.cpp:203] Token: grid_size
+I0402 16:35:00.261538 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261539 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261541 13729 TranslationUnit.cpp:203] Token: // make image
+I0402 16:35:00.261543 13729 TranslationUnit.cpp:203] Token: cv
+I0402 16:35:00.261544 13729 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.261545 13729 TranslationUnit.cpp:203] Token: Mat
+I0402 16:35:00.261546 13729 TranslationUnit.cpp:203] Token: blank_image
+I0402 16:35:00.261548 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.261549 13729 TranslationUnit.cpp:203] Token: cv
+I0402 16:35:00.261550 13729 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.261552 13729 TranslationUnit.cpp:203] Token: Mat
+I0402 16:35:00.261554 13729 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.261555 13729 TranslationUnit.cpp:203] Token: zeros
+I0402 16:35:00.261556 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261557 13729 TranslationUnit.cpp:203] Token: image_height
+I0402 16:35:00.261559 13729 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.261560 13729 TranslationUnit.cpp:203] Token: image_width
+I0402 16:35:00.261561 13729 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.261564 13729 TranslationUnit.cpp:203] Token: CV_U8C3
+I0402 16:35:00.261564 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261566 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261567 13729 TranslationUnit.cpp:203] Token: blank_image
+I0402 16:35:00.261569 13729 TranslationUnit.cpp:203] Token: .
+I0402 16:35:00.261570 13729 TranslationUnit.cpp:203] Token: copyTo
+I0402 16:35:00.261571 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261574 13729 TranslationUnit.cpp:203] Token: *
+I0402 16:35:00.261574 13729 TranslationUnit.cpp:203] Token: image
+I0402 16:35:00.261575 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261577 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261579 13729 TranslationUnit.cpp:203] Token: for
+I0402 16:35:00.261579 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261584 13729 TranslationUnit.cpp:203] Token: auto
+I0402 16:35:00.261585 13729 TranslationUnit.cpp:203] Token: grid2_sample
+I0402 16:35:00.261586 13729 TranslationUnit.cpp:203] Token: :
+I0402 16:35:00.261588 13729 TranslationUnit.cpp:203] Token: grid2_samples_
+I0402 16:35:00.261590 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261591 13729 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.261592 13729 TranslationUnit.cpp:203] Token: // set pixel value
+I0402 16:35:00.261593 13729 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.261595 13729 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.261596 13729 TranslationUnit.cpp:203] Token: void
+I0402 16:35:00.261598 13729 TranslationUnit.cpp:203] Token: IntensityMapBuilder
+I0402 16:35:00.261600 13729 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.261600 13729 TranslationUnit.cpp:203] Token: createHeightInfo
+I0402 16:35:00.261602 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261603 13729 TranslationUnit.cpp:203] Token: /* protoBufType *intensity_map_info */
+I0402 16:35:00.261605 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261606 13729 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.261608 13729 TranslationUnit.cpp:203] Token: }
+I0402 16:35:00.261610 13729 TranslationUnit.cpp:203] Token: bool
+I0402 16:35:00.261610 13729 TranslationUnit.cpp:203] Token: IntensityMapBuilder
+I0402 16:35:00.261612 13729 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.261613 13729 TranslationUnit.cpp:203] Token: saveIntensityMap
+I0402 16:35:00.261615 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261616 13729 TranslationUnit.cpp:203] Token: const
+I0402 16:35:00.261617 13729 TranslationUnit.cpp:203] Token: std
+I0402 16:35:00.261620 13729 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.261620 13729 TranslationUnit.cpp:203] Token: string
+I0402 16:35:00.261622 13729 TranslationUnit.cpp:203] Token: &
+I0402 16:35:00.261623 13729 TranslationUnit.cpp:203] Token: output_folder
+I0402 16:35:00.261624 13729 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.261626 13729 TranslationUnit.cpp:203] Token: const
+I0402 16:35:00.261627 13729 TranslationUnit.cpp:203] Token: cv
+I0402 16:35:00.261628 13729 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.261631 13729 TranslationUnit.cpp:203] Token: Mat
+I0402 16:35:00.261631 13729 TranslationUnit.cpp:203] Token: &
+I0402 16:35:00.261632 13729 TranslationUnit.cpp:203] Token: image
+I0402 16:35:00.261634 13729 TranslationUnit.cpp:203] Token: /*const protoBufType *intensity_map_info */
+I0402 16:35:00.261636 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261637 13729 TranslationUnit.cpp:203] Token: {
+I0402 16:35:00.261638 13729 TranslationUnit.cpp:203] Token: // check or make output folder
+I0402 16:35:00.261641 13729 TranslationUnit.cpp:203] Token: // save image
+I0402 16:35:00.261641 13729 TranslationUnit.cpp:203] Token: std
+I0402 16:35:00.261643 13729 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.261644 13729 TranslationUnit.cpp:203] Token: string
+I0402 16:35:00.261646 13729 TranslationUnit.cpp:203] Token: image_name
+I0402 16:35:00.261647 13729 TranslationUnit.cpp:203] Token: =
+I0402 16:35:00.261648 13729 TranslationUnit.cpp:203] Token: output_folder
+I0402 16:35:00.261651 13729 TranslationUnit.cpp:203] Token: +
+I0402 16:35:00.261651 13729 TranslationUnit.cpp:203] Token: "/intensity_image.png"
+I0402 16:35:00.261653 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261654 13729 TranslationUnit.cpp:203] Token: cv
+I0402 16:35:00.261656 13729 TranslationUnit.cpp:203] Token: ::
+I0402 16:35:00.261657 13729 TranslationUnit.cpp:203] Token: imwrite
+I0402 16:35:00.261658 13729 TranslationUnit.cpp:203] Token: (
+I0402 16:35:00.261659 13729 TranslationUnit.cpp:203] Token: image_name
+I0402 16:35:00.261662 13729 TranslationUnit.cpp:203] Token: ,
+I0402 16:35:00.261662 13729 TranslationUnit.cpp:203] Token: image
+I0402 16:35:00.261664 13729 TranslationUnit.cpp:203] Token: )
+I0402 16:35:00.261665 13729 TranslationUnit.cpp:203] Token: ;
+I0402 16:35:00.261667 13729 TranslationUnit.cpp:203] Token: // save intensit

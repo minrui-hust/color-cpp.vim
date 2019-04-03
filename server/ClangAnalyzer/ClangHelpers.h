@@ -1,0 +1,37 @@
+// Copyright (C) 2013-2018 ycmd contributors
+//
+// This file is part of ycmd.
+//
+// ycmd is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// ycmd is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with ycmd.  If not, see <http://www.gnu.org/licenses/>.
+
+#ifndef CLANGHELPERS_H_T3ME71LG
+#define CLANGHELPERS_H_T3ME71LG
+
+#include "Highlight.h"
+#include "UnsavedFile.h"
+
+#include <vector>
+#include <clang-c/Index.h>
+#include <memory>
+
+// NOTE: CXUnsavedFiles store pointers to data in UnsavedFiles, so UnsavedFiles
+// need to outlive CXUnsavedFiles!
+std::vector< CXUnsavedFile > ToCXUnsavedFiles(
+  const std::vector< UnsavedFile > &unsaved_files );
+
+Highlight BuildHighlight(const std::string& name, const std::string& type,
+                         unsigned int line, unsigned int col);
+
+#endif /* end of include guard: CLANGHELPERS_H_T3ME71LG */
+

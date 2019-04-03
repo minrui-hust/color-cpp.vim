@@ -1,0 +1,808 @@
+Log file created at: 2019/04/02 15:09:18
+Running on machine: mr-pc
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0402 15:09:18.971676  3821 json_parser.cpp:18] 
+[
+	1,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  \n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:20.811350  3821 json_parser.cpp:18] 
+[
+	2,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:20.832495  3821 json_parser.cpp:18] 
+[
+	3,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:20.843999  3821 json_parser.cpp:18] 
+[
+	4,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:23.651752  3821 json_parser.cpp:18] 
+[
+	5,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  \n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:24.498787  3821 json_parser.cpp:18] 
+[
+	6,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:24.519809  3821 json_parser.cpp:18] 
+[
+	7,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:24.536875  3821 json_parser.cpp:18] 
+[
+	8,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:32.819578  3821 json_parser.cpp:18] 
+[
+	9,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  \n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:36.172981  3821 json_parser.cpp:18] 
+[
+	10,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  ;kj\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:38.044085  3821 json_parser.cpp:18] 
+[
+	11,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:46.027655  3821 json_parser.cpp:18] 
+[
+	12,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n  \n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:49.637032  3821 json_parser.cpp:18] 
+[
+	13,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n  asdf\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:50.836366  3821 json_parser.cpp:18] 
+[
+	14,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:53.499490  3821 json_parser.cpp:18] 
+[
+	15,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:54.281685  3821 json_parser.cpp:18] 
+[
+	16,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:54.301832  3821 json_parser.cpp:18] 
+[
+	17,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:55.075436  3821 json_parser.cpp:18] 
+[
+	18,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n  \n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:55.985507  3821 json_parser.cpp:18] 
+[
+	19,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:56.000088  3821 json_parser.cpp:18] 
+[
+	20,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:56.051648  3821 json_parser.cpp:18] 
+[
+	21,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:56.627635  3821 json_parser.cpp:18] 
+[
+	22,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n  \n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:57.929003  3821 json_parser.cpp:18] 
+[
+	23,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n\n\n\n\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:57.943665  3821 json_parser.cpp:18] 
+[
+	24,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n\n\n\n\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:09:57.955754  3821 json_parser.cpp:18] 
+[
+	25,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:10:01.194851  3821 json_parser.cpp:18] 
+[
+	26,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  \n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:10:01.888984  3821 json_parser.cpp:18] 
+[
+	27,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:10:01.903582  3821 json_parser.cpp:18] 
+[
+	28,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:10:01.915976  3821 json_parser.cpp:18] 
+[
+	29,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:10:03.179275  3821 json_parser.cpp:18] 
+[
+	30,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n    \n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:10:04.400946  3821 json_parser.cpp:18] 
+[
+	31,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n\n\n\n\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:10:04.415364  3821 json_parser.cpp:18] 
+[
+	32,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp",
+		"flags" : 
+		[
+			"-x",
+			"c++",
+			"-std=c++14",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_includes",
+			"-I/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/llvm/include",
+			"-I/usr/local/include",
+			"-I/usr/include/c++/5",
+			"-I/usr/include",
+			"-resource-dir=/home/mr/.vim/bundle/YouCompleteMe/third_party/ycmd/third_party/clang/lib/clang/7.0.0",
+			"-fspell-checking"
+		],
+		"unsaved" : 
+		{
+			"content" : "#include <fcntl.h>\n#include <fstream>\n#include <iostream>\n#include <memory>\n#include <stdio.h>\n#include <stdlib.h>\n#include <sys/stat.h>\n#include <sys/types.h>\n#include <unistd.h>\n\n#include \"json/json.h\"\n#include \"glog/logging.h\"\n\n#include \"json_parser.h\"\n#include \"syntax_analyzer.h\"\n\nconstexpr int kStdinBufferSize = 1024 * 10; // 10K\n\nvoid setupGlog(char** argv){\n  google::InitGoogleLogging(argv[0]);  \n  google::SetLogDestination(google::GLOG_INFO, \"/home/mr/.vim/bundle/color-cpp/server/log/\");\n}\n\nint main(int argc, char**argv) {\n  setupGlog(argv);\n\n  char *stdin_buf = new char[kStdinBufferSize+1];\n  size_t stdin_read_size;\n  JsonParser parser;\n  SyntaxAnalyzer analyzer;\n  std::shared_ptr<std::string> response;\n\n  while (true) {\n\n\n\n\n    stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);\n    if (stdin_read_size > 0) {\n      auto json_value = parser.parse(stdin_buf, stdin_read_size);\n      if(json_value){\n        analyzer.processRequest(*json_value);\n      }\n    }\n  }\n\n  return 0;\n}\n",
+			"filename" : "/home/mr/.vim/bundle/color-cpp/server/server.cpp"
+		}
+	}
+]
+I0402 15:10:04.427785  3821 json_parser.cpp:18] 
+[
+	33,
+	{
+		"filename" : "/home/mr/.vim/bundle/color-
