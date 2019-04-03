@@ -1,2 +1,0 @@
-/usr/bin/ar qc libclang_analyzer.a  CMakeFiles/clang_analyzer.dir/ClangAnalyzer.cpp.o CMakeFiles/clang_analyzer.dir/ClangHelpers.cpp.o CMakeFiles/clang_analyzer.dir/ClangUtils.cpp.o CMakeFiles/clang_analyzer.dir/Range.cpp.o CMakeFiles/clang_analyzer.dir/TranslationUnit.cpp.o CMakeFiles/clang_analyzer.dir/TranslationUnitStore.cpp.o
-/usr/bin/ranlib libclang_analyzer.a
