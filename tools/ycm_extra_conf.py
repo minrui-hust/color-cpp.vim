@@ -1,35 +1,31 @@
-# author: minrui
-
 import os
 import re
 import ycm_core
 
-DIR_OF_THIS_SCRIPT = os.path.abspath( os.path.dirname( __file__ ) )
-DIR_OF_THIRD_PARTY = os.path.join( DIR_OF_THIS_SCRIPT, 'third_party' )
-SOURCE_EXTENSIONS = [ '.cpp', '.cxx', '.cc', '.c', '.m', '.mm' ]
 
-# set this to the directory which compile_commands.json
+# set this to the directory which compile_commands.json exist
 compilation_database_folder = '/home/mr/Workspace/loc/build'
+# set this to the directory which compile_commands.json exist
 
-compilation_database_path = os.path.join(compilation_database_folder, 'compile_commands.json')
-if os.path.exists( compilation_database_path ):
-  database = ycm_core.CompilationDatabase( compilation_database_folder )
-else:
-  database = None
 
 #extra flags for both source and header files
 extra_flag = [
 '-I/usr/include/c++/5',
 '-I/usr/include',
 ]
+#extra flags for both source and header files
 
-# flags for header files
+
+# flags for header files, and source file not in database
 flags = [
 '-x',
 'c++',
 '-std=c++14',
 ]
+# flags for header files, and source file not in database
 
+
+# this function extract all the flags appeared in the database
 def flagsFromDatabase(database_file_path):
     command_line_pattern = re.compile(r'^\s+"command":')
     include_pattern = re.compile(r'^(-I.+)\s*$')
@@ -38,7 +34,7 @@ def flagsFromDatabase(database_file_path):
 
     database_file = open(database_file_path)
     lines = database_file.readlines()
-    config_file.close()
+    database_file.close()
     
     flags = set()
     tmp_flag = ""
@@ -61,11 +57,19 @@ def flagsFromDatabase(database_file_path):
                 elif match_define:
                     flags.add(seg)
     return list(flags)
-    
 
+    
 database_flags = []
-if database:
-    database_flags = flagsFromDatabase(compilation_database_path)
+
+
+# check if compilation database exist
+compilation_database_path = os.path.join(compilation_database_folder, 'compile_commands.json')
+if os.path.exists( compilation_database_path ):
+  database = ycm_core.CompilationDatabase( compilation_database_folder )
+  database_flags = flagsFromDatabase(compilation_database_path)
+else:
+  database = None
+
 
 
 # this is the only function that YCM needed
@@ -85,7 +89,7 @@ def Settings( **kwargs ):
     # else file is not the database, or database not exist, use what we set previous
     return {
             'flags': database_flags + flags + extra_flag,
-            'include_paths_relative_to_dir': DIR_OF_THIS_SCRIPT,
+            'include_paths_relative_to_dir': os.path.abspath(os.path.dirname(__file__)),
             'override_filename': filename
             }
   return {}
