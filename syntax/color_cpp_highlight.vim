@@ -1,8 +1,6 @@
 " Vim global plugin for semantic highlighting using libclang
 " Maintainer: Jeaye <contact@jeaye.com>
 
-echom "Load color code highlight"
-
 "hi link ColorCodeType                      Type
 hi ColorCodeType ctermfg=Blue guifg=#164f99
 hi link StructDecl                         ColorCodeType

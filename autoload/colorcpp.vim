@@ -17,34 +17,6 @@ function! colorcpp#enable_colorcpp()
 endfunction
 
 function! s:setup_commands()
-  command! ColorCppUpdateConf call s:update_ycm_extra_conf()
-endfunction
-
-function! s:update_ycm_extra_conf()
-    let l:cur_file = expand('%:p')
-    let l:dentries = split(cur_file, '/')[0:-2]
-    let l:home_path = $HOME
-
-    let l:ycm_extra_conf_file = ""
-    let l:cur_path = "/".join(dentries, "/")
-    let l:project_setting_dir = ""
-    while cur_path != home_path
-        let l:ycm_extra_conf_file= globpath(cur_path, ".ycm_extra_conf.py")
-        if l:ycm_extra_conf_file != ""
-            break
-        endif
-
-        let l:dentries = l:dentries[0:-2]
-        let l:cur_path = "/".join(l:dentries, "/")
-    endwhile
-
-    if l:ycm_extra_conf_file == ""
-        echo "Could not find ycm_extra_conf_file"
-        return
-    endif
-
-    exec "!"
-    exec "YcmCompleter ClearCompilationFlagCache"
 endfunction
 
 function! s:setup_auto_group()

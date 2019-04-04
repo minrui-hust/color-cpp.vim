@@ -34,11 +34,6 @@ cli = client.Client()
 EOF
 endfunction
 
-function! pysupport#test_python()
-  python3 cli.test()
-  echom py3eval('cli.requestData()')
-endfunction
-
 function! pysupport#parse_current_buffer()
   python3 cli.parseCurrentBuffer()
 endfunction
