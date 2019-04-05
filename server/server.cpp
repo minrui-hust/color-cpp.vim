@@ -8,23 +8,44 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "json/json.h"
 #include "glog/logging.h"
+#include "json/json.h"
 
 #include "json_parser.h"
 #include "syntax_analyzer.h"
 
-constexpr int kStdinBufferSize = 1024 * 100; // 10K
+#define LOG_ENABLE 0
 
-void setupGlog(char** argv){
-  google::InitGoogleLogging(argv[0]);  
-  google::SetLogDestination(google::GLOG_INFO, "/home/mr/.vim/bundle/color-cpp/server/log/");
+constexpr int kStdinBufferSize = 1024 * 1024; // 1M
+
+void setupLog(char **argv) {
+  // get the path of server
+  std::string this_program_path(argv[0]);
+  int pos = this_program_path.find_last_of('/');
+  if (pos < 0) {
+    return;
+  }
+  std::string this_program_folder = this_program_path.substr(0, pos);
+
+  // check if log folder exist
+  if (access((this_program_folder + "/log").c_str(), 0) < 0) {
+    mkdir((this_program_folder + "/log").c_str(), 0777);
+  }
+
+#if LOG_ENABLE
+  google::InitGoogleLogging(argv[0]);
+  google::SetLogDestination(google::GLOG_INFO,
+                            (this_program_folder + "/log/").c_str());
+#endif
+
+  // redirect the stderr to /log/err.log
+  freopen((this_program_folder + "/log/err.log").c_str(), "w", stderr);
 }
 
-int main(int argc, char**argv) {
-  setupGlog(argv);
+int main(int argc, char **argv) {
+  setupLog(argv);
 
-  char *stdin_buf = new char[kStdinBufferSize+1];
+  char *stdin_buf = new char[kStdinBufferSize + 1];
   size_t stdin_read_size;
   JsonParser parser;
   SyntaxAnalyzer analyzer;
@@ -34,7 +55,7 @@ int main(int argc, char**argv) {
     stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);
     if (stdin_read_size > 0) {
       auto json_value = parser.parse(stdin_buf, stdin_read_size);
-      if(json_value){
+      if (json_value) {
         analyzer.processRequest(*json_value);
       }
     }
