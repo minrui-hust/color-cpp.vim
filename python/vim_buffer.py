@@ -14,6 +14,7 @@ class VimBuffer(object):
         self._parse_doing = False
         self._highlight = hl.Highlight(self._bufnr)
         self._req_data = {}
+        self._last_content=""
 
 
     def requestData(self):
@@ -21,9 +22,6 @@ class VimBuffer(object):
 
 
     def handleParseRequest(self):
-        if self._parse_doing:
-            return
-
         filetype = vs.getBufferFiletypeByNumber(self._bufnr)
         if not filetype in SUPPORTED_FILE_TYPES:
             return
@@ -36,6 +34,10 @@ class VimBuffer(object):
 
         content = vs.getBufferContentByNumber(self._bufnr)
 
+        # if parse is doing and content no change, we abort this parse request
+        if self._parse_doing and self._last_content == content:
+            return
+
         parse_request = {}
         parse_request['bufnr'] = self._bufnr;
         parse_request['filename'] = translation_unit_name;
@@ -44,6 +46,7 @@ class VimBuffer(object):
 
         self._req_data = parse_request
         vs.publishRequest()
+        self._last_content = content
         self._parse_doing = True
 
 
