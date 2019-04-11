@@ -13,8 +13,8 @@ class VimBuffer(object):
         self._bufnr = bufnr 
         self._parse_doing = False
         self._highlight = hl.Highlight(self._bufnr)
-        self._req_data = {}
-        self._last_content=""
+        self._req_data = None
+        self._pending_req_data = None
 
 
     def requestData(self):
@@ -34,26 +34,32 @@ class VimBuffer(object):
 
         content = vs.getBufferContentByNumber(self._bufnr)
 
-        # if parse is doing and content no change, we abort this parse request
-        if self._parse_doing and self._last_content == content:
-            return
-
         parse_request = {}
         parse_request['bufnr'] = self._bufnr;
         parse_request['filename'] = translation_unit_name;
         parse_request['flags'] = flags;
         parse_request['unsaved'] = {'filename':filename, 'content':content}
 
-        self._req_data = parse_request
-        vs.publishRequest()
-        self._last_content = content
-        self._parse_doing = True
+        if self._parse_doing:
+            # if parse is doing, we just pending the request
+            self._pending_req_data = parse_request
+        else:
+            self._req_data = parse_request
+            vs.publishRequest()
+            self._parse_doing = True
 
 
     def handleParseResponse(self, response):
         if 'highlights' in response:
             self._highlight.updateWithNewHighlights(response['highlights'])
-        self._parse_doing = False;
+
+        # check if ther is pending req
+        if self._pending_req_data:
+            self._req_data = self._pending_req_data
+            self._pending_req_data = None
+            vs.publishRequest()
+        else:
+            self._parse_doing = False;
 
 
     def refreshHighlights(self):
