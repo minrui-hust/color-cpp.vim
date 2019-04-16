@@ -4,18 +4,13 @@ project(colorcpp_server)
 
 set(CMAKE_CXX_FLAGS "-std=c++14 -march=native -pipe -O2 -Wall -Wextra -fopenmp -fPIC -pthread")
 
-set(LIBCLANG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../YouCompleteMe/third_party/ycmd/third_party/clang/lib)
-
-find_package(jsoncpp REQUIRED)
-
 include_directories(
-  /usr/local/include
+  third_party/jsoncpp-1.8.4/include
   ${CMAKE_CURRENT_SOURCE_DIR}/../../YouCompleteMe/third_party/ycmd/cpp/llvm/include
   )
 
 link_directories(
-  /usr/local/lib
-  ${LIBCLANG_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}
   )
 
 add_executable(server 
@@ -37,3 +32,4 @@ add_custom_command(
 )
 
 add_subdirectory(ClangAnalyzer)
+add_subdirectory(third_party/jsoncpp-1.8.4)
