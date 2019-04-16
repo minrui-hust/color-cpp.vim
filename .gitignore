@@ -1,7 +1,7 @@
 build/
 log/
 __pycache__/
-server
+clang_server
 .pyc
 .swp
 .swo
