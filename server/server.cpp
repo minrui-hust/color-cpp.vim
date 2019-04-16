@@ -57,6 +57,8 @@ int main(int argc, char **argv) {
       auto json_value = parser.parse(stdin_buf, stdin_read_size);
       if (json_value) {
         analyzer.processRequest(*json_value);
+      } else {
+        std::cerr << "parse json string error" << std::endl;
       }
     }
   }

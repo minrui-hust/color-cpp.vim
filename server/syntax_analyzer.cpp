@@ -1,8 +1,8 @@
 #include "syntax_analyzer.h"
+#include "glog/logging.h"
 #include <future>
 #include <iostream>
 #include <unistd.h>
-#include "glog/logging.h"
 
 SyntaxAnalyzer::SyntaxAnalyzer() {
   Json::StreamWriterBuilder builer;
@@ -30,7 +30,7 @@ void SyntaxAnalyzer::processRequest(const Json::Value &request) {
     auto highlights = clang_analyzer_->UpdateTranslationUnit(
         translation_unit_name, unsaved_files, flags);
 
-    //LOG(INFO)<<"Total highlight: "<<highlights.size();
+    // LOG(INFO)<<"Total highlight: "<<highlights.size();
 
     Json::Value response;
     response[0] = 0;
@@ -43,14 +43,15 @@ void SyntaxAnalyzer::processRequest(const Json::Value &request) {
       value["line"] = highlight.line_;
       value["col"] = highlight.col_;
       response[1]["highlights"].append(value);
-      //LOG(INFO)<<highlight.text_<<" "<<highlight.type_<<" "<<highlight.line_<<" "<<highlight.col_;
+      // LOG(INFO)<<highlight.text_<<" "<<highlight.type_<<"
+      // "<<highlight.line_<<" "<<highlight.col_;
     }
 
     std::ostringstream oss;
     writer_->write(response, &oss);
     std::string rsp_str = oss.str();
 
-    //LOG(INFO)<<"\n"<<rsp_str;
+    // LOG(INFO)<<"\n"<<rsp_str;
 
     stdout_lock_.lock();
     write(STDOUT_FILENO, rsp_str.c_str(), rsp_str.size());
