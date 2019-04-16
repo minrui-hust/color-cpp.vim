@@ -17,6 +17,7 @@ function! colorcpp#enable_colorcpp()
 endfunction
 
 function! s:setup_commands()
+  command ColorCppForceParse call pysupport#force_parse_current_buffer()
 endfunction
 
 function! s:setup_auto_group()

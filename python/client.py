@@ -12,9 +12,9 @@ class Client(object):
         bufnr = vs.getCurrentBufferNumber()
         return self._getVimBufferByNumber(bufnr).requestData()
 
-    def parseCurrentBuffer(self):
+    def parseCurrentBuffer(self, force=False):
         bufnr = vs.getCurrentBufferNumber()
-        self._getVimBufferByNumber(bufnr).handleParseRequest()
+        self._getVimBufferByNumber(bufnr).handleParseRequest(force)
 
     def handleResponse(self, response):
         if 'bufnr' in response:

@@ -21,7 +21,7 @@ class VimBuffer(object):
         return self._req_data
 
 
-    def handleParseRequest(self):
+    def handleParseRequest(self, force):
         filetype = vs.getBufferFiletypeByNumber(self._bufnr)
         if not filetype in SUPPORTED_FILE_TYPES:
             return
@@ -40,10 +40,12 @@ class VimBuffer(object):
         parse_request['flags'] = flags;
         parse_request['unsaved'] = {'filename':filename, 'content':content}
 
-        if self._parse_doing:
+        if self._parse_doing and not force:
             # if parse is doing, we just pending the request
             self._pending_req_data = parse_request
+            # print("parse doing, request pended")
         else:
+            self._pending_req_data = None
             self._req_data = parse_request
             vs.publishRequest()
             self._parse_doing = True

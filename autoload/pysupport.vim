@@ -35,7 +35,11 @@ EOF
 endfunction
 
 function! pysupport#parse_current_buffer()
-  python3 cli.parseCurrentBuffer()
+  python3 cli.parseCurrentBuffer(force=False)
+endfunction
+
+function! pysupport#force_parse_current_buffer()
+  python3 cli.parseCurrentBuffer(force=True)
 endfunction
 
 function! pysupport#handle_response(channel, response)
