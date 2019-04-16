@@ -13,12 +13,12 @@ link_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
   )
 
-add_executable(server 
+add_executable(clang_server 
                server.cpp
                json_parser.cpp
                syntax_analyzer.cpp
                )
-target_link_libraries(server
+target_link_libraries(clang_server
   jsoncpp
   glog
   clang_analyzer
@@ -26,9 +26,9 @@ target_link_libraries(server
   )
 
 add_custom_command(
-    TARGET server
+    TARGET clang_server
     POST_BUILD
-    COMMAND cp ARGS ${CMAKE_CURRENT_BINARY_DIR}/server ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMAND cp ARGS ${CMAKE_CURRENT_BINARY_DIR}/clang_server ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 add_subdirectory(ClangAnalyzer)
