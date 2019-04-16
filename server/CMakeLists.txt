@@ -10,7 +10,7 @@ include_directories(
   )
 
 link_directories(
-  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../YouCompleteMe/third_party/ycmd/third_party/clang/lib
   )
 
 add_executable(clang_server 

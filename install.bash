@@ -5,7 +5,12 @@ rm -rf ./server/build
 mkdir -p ./server/build
 cd ./server/build
 
-ln -sf `pwd`/../../../YouCompleteMe/third_party/ycmd/third_party/clang/lib/libclang.so.7 libclang.so
+BUILD_DIR=`pwd`
+CLANG_LIB_DIR=${BUILD_DIR}/../../../YouCompleteMe/third_party/ycmd/third_party/clang/lib
 
-cmake ..
+cd ${CLANG_LIB_DIR}
+ln -sf libclang.so.7 libclang.so
+
+cd ${BUILD_DIR}
+cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=yes
 make

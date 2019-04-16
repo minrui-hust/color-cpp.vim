@@ -67,7 +67,7 @@ function! s:setup_server() abort
   let l:job_option['out_io'] = "pipe"
   let l:job_option['out_mode'] = "json"
   let l:job_option['out_cb'] = "pysupport#handle_response"
-  let s:server_job = job_start($VIMHOME.'/server/server', l:job_option)
+  let s:server_job = job_start($VIMHOME.'/server/clang_server', l:job_option)
   if job_status(s:server_job) == "fail"
     echom "Falid to start color-cpp server, install first"
     finish
