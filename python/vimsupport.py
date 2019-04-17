@@ -29,8 +29,8 @@ def getCurrentWindow():
     return vim.current.window
 
 
-def publishRequest():
-    command_string = "call ch_sendexpr(g:colorcpp_job_channel, py3eval('cli.requestData()'))"
+def publishRequest(bufnr):
+    command_string = "call ch_sendexpr(g:colorcpp_job_channel, py3eval('cli.requestData("+str(bufnr)+")'))"
     vim.command(command_string)
 
 

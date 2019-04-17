@@ -10,21 +10,19 @@ class Client(object):
         self._req_data = None
         self._cnt = 0
 
-    def requestData(self):
-        print("req cnt:"+str(self._req_data['cnt'])+"\n")
-        return self._req_data
-
-    def setRequestData(self, req_data):
-        self._req_data = req_data
-        self._req_data['cnt'] = self._cnt;
+    def requestData(self, bufnr):
+        req_data = self._getVimBufferByNumber(bufnr).getRequestData()
+        req_data['cnt'] = self._cnt
         self._cnt = self._cnt + 1
+        #print("req cnt:"+str(req_data['cnt'])+"\n")
+        return req_data
 
     def parseCurrentBuffer(self, force=False):
         bufnr = vs.getCurrentBufferNumber()
         self._getVimBufferByNumber(bufnr).handleParseRequest(force)
 
     def handleResponse(self, response):
-        print("rsp cnt:"+response['cnt']+"\n")
+        #print("rsp cnt:"+response['cnt']+"\n")
         if 'bufnr' in response:
             bufnr = int(response['bufnr'])
             self._getVimBufferByNumber(bufnr).handleParseResponse(response)

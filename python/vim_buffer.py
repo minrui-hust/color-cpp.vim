@@ -14,7 +14,11 @@ class VimBuffer(object):
         self._parse_doing = False
         self._highlight = hl.Highlight(self._bufnr)
         self._pending_req_data = None
-        self._client = client
+        self._req_data = None
+
+
+    def getRequestData(self):
+        return self._req_data
 
 
     def handleParseRequest(self, force):
@@ -42,8 +46,8 @@ class VimBuffer(object):
             # print("parse doing, request pended")
         else:
             self._pending_req_data = None
-            self._client.setRequestData(parse_request)
-            vs.publishRequest()
+            self._req_data = parse_request
+            vs.publishRequest(self._bufnr)
             self._parse_doing = True
 
 
@@ -53,9 +57,9 @@ class VimBuffer(object):
 
         # check if ther is pending req
         if self._pending_req_data:
-            self._client.setRequestData(self._pending_req_data)
+            self._req_data = self._pending_req_data
             self._pending_req_data = None
-            vs.publishRequest()
+            vs.publishRequest(self._bufnr)
         else:
             self._parse_doing = False;
 
