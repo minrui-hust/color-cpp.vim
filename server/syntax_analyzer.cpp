@@ -12,8 +12,11 @@ SyntaxAnalyzer::SyntaxAnalyzer() {
 
 void SyntaxAnalyzer::processRequest(const Json::Value &request) {
   std::string translation_unit_name = request[1]["filename"].asString();
-
+  int parse_cnt = request[1]["cnt"].asInt();
   int buffer_number = request[1]["bufnr"].asInt();
+
+  std::cerr << "Parsing: " << translation_unit_name << std::endl;
+  std::cerr << "cnt: " << parse_cnt << std::endl;
 
   UnsavedFile unsaved;
   unsaved.filename_ = request[1]["unsaved"]["filename"].asString();
@@ -34,6 +37,7 @@ void SyntaxAnalyzer::processRequest(const Json::Value &request) {
 
     Json::Value response;
     response[0] = 0;
+    response[1]["cnt"] = parse_cnt;
     response[1]["filename"] = translation_unit_name;
     response[1]["bufnr"] = buffer_number;
     for (const auto &highlight : highlights) {
@@ -56,5 +60,8 @@ void SyntaxAnalyzer::processRequest(const Json::Value &request) {
     stdout_lock_.lock();
     write(STDOUT_FILENO, rsp_str.c_str(), rsp_str.size());
     stdout_lock_.unlock();
+
+    std::cerr << "Parse Done: " << translation_unit_name << std::endl;
+    std::cerr << "cnt: " << parse_cnt << std::endl;
   });
 }

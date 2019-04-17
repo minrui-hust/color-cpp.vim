@@ -40,6 +40,7 @@ void setupLog(char **argv) {
 
   // redirect the stderr to /log/err.log
   freopen((this_program_folder + "/log/err.log").c_str(), "w", stderr);
+  std::cerr << "Error logging started" << std::endl;
 }
 
 int main(int argc, char **argv) {

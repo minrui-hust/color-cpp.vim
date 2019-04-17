@@ -9,16 +9,12 @@ SUPPORTED_FILE_TYPES = ['cpp', 'c', 'h', 'hpp', 'cxx', 'cc']
 flag_store = Flags()
 
 class VimBuffer(object):
-    def __init__(self, bufnr):
+    def __init__(self, bufnr, client):
         self._bufnr = bufnr 
         self._parse_doing = False
         self._highlight = hl.Highlight(self._bufnr)
-        self._req_data = None
         self._pending_req_data = None
-
-
-    def requestData(self):
-        return self._req_data
+        self._client = client
 
 
     def handleParseRequest(self, force):
@@ -46,7 +42,7 @@ class VimBuffer(object):
             # print("parse doing, request pended")
         else:
             self._pending_req_data = None
-            self._req_data = parse_request
+            self._client.setRequestData(parse_request)
             vs.publishRequest()
             self._parse_doing = True
 
@@ -57,7 +53,7 @@ class VimBuffer(object):
 
         # check if ther is pending req
         if self._pending_req_data:
-            self._req_data = self._pending_req_data
+            self._client.setRequestData(self._pending_req_data)
             self._pending_req_data = None
             vs.publishRequest()
         else:
