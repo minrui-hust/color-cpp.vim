@@ -25,6 +25,7 @@ function! s:setup_auto_group()
     autocmd!
     autocmd FileType,BufEnter,WinEnter * call pysupport#parse_current_buffer()
     autocmd InsertLeave,InsertEnter,TextChanged * call pysupport#parse_current_buffer()
+    autocmd CursorHold,CursorHoldI * call pysupport#parse_current_buffer()
 
     autocmd WinEnter,BufEnter * call pysupport#refresh_window_highlight()
     autocmd CursorMoved,CursorMovedI * call pysupport#move_highlight()

@@ -4,6 +4,8 @@
 #include <iostream>
 #include <unistd.h>
 
+const int SyntaxAnalyzer::kMaxThreadNum = 6;
+
 SyntaxAnalyzer::SyntaxAnalyzer() {
   Json::StreamWriterBuilder builer;
   writer_ = std::unique_ptr<Json::StreamWriter>(builer.newStreamWriter());
@@ -11,57 +13,73 @@ SyntaxAnalyzer::SyntaxAnalyzer() {
 }
 
 void SyntaxAnalyzer::processRequest(const Json::Value &request) {
-  std::string translation_unit_name = request[1]["filename"].asString();
-  int parse_cnt = request[1]["cnt"].asInt();
-  int buffer_number = request[1]["bufnr"].asInt();
+  std::shared_ptr<Request> req = std::make_shared<Request>();
 
-  std::cerr << "Parsing: " << translation_unit_name << std::endl;
-  std::cerr << "cnt: " << parse_cnt << std::endl;
+  req->translation_unit_name = request[1]["filename"].asString();
+  req->parse_id = request[1]["cnt"].asInt();
+  req->buf_num = request[1]["bufnr"].asInt();
 
   UnsavedFile unsaved;
   unsaved.filename_ = request[1]["unsaved"]["filename"].asString();
   unsaved.contents_ = request[1]["unsaved"]["content"].asString();
   unsaved.length_ = unsaved.contents_.size();
-  std::vector<UnsavedFile> unsaved_files{unsaved};
 
-  std::vector<std::string> flags;
+  req->unsaved_files = std::make_shared<std::vector<UnsavedFile>>();
+  req->unsaved_files->emplace_back(unsaved);
+
+  req->flags = std::make_shared<std::vector<std::string>>();
   for (auto const &flag : request[1]["flags"]) {
-    flags.emplace_back(flag.asString());
+    req->flags->emplace_back(flag.asString());
   }
 
-  std::async(std::launch::async, [&]() {
-    auto highlights = clang_analyzer_->UpdateTranslationUnit(
-        translation_unit_name, unsaved_files, flags);
+  // check if we have thread to process the request
+  bool should_emit = false;
+  thread_counter_lock_.lock();
+  if(thread_number_ < kMaxThreadNum){
+    thread_number_++;
+    should_emit = true;
+    LOG(INFO)<<"Thread number++:"<<thread_number_;
+  }
+  thread_counter_lock_.unlock();
 
-    // LOG(INFO)<<"Total highlight: "<<highlights.size();
+  if(should_emit){
+    std::async(std::launch::async, [this](const std::shared_ptr<Request>& emit) {
+      LOG(INFO)<<"Parsing begin! Id:"<<emit->parse_id<<" ,Bufnr:"<<emit->buf_num<<" ,File:"<<emit->translation_unit_name;
 
-    Json::Value response;
-    response[0] = 0;
-    response[1]["cnt"] = parse_cnt;
-    response[1]["filename"] = translation_unit_name;
-    response[1]["bufnr"] = buffer_number;
-    for (const auto &highlight : highlights) {
-      Json::Value value;
-      value["text"] = highlight.text_;
-      value["type"] = highlight.type_;
-      value["line"] = highlight.line_;
-      value["col"] = highlight.col_;
-      response[1]["highlights"].append(value);
-      // LOG(INFO)<<highlight.text_<<" "<<highlight.type_<<"
-      // "<<highlight.line_<<" "<<highlight.col_;
-    }
+      auto highlights = clang_analyzer_->UpdateTranslationUnit(
+          emit->translation_unit_name, *(emit->unsaved_files), *(emit->flags.get()));
 
-    std::ostringstream oss;
-    writer_->write(response, &oss);
-    std::string rsp_str = oss.str();
+      Json::Value response;
+      response[0] = 0;
+      response[1]["cnt"] = emit->parse_id;
+      response[1]["filename"] = emit->translation_unit_name;
+      response[1]["bufnr"] = emit->buf_num;
+      for (const auto &highlight : highlights) {
+        Json::Value value;
+        value["text"] = highlight.text_;
+        value["type"] = highlight.type_;
+        value["line"] = highlight.line_;
+        value["col"] = highlight.col_;
+        response[1]["highlights"].append(value);
+      }
 
-    // LOG(INFO)<<"\n"<<rsp_str;
+      std::ostringstream oss;
+      writer_->write(response, &oss);
+      std::string rsp_str = oss.str();
 
-    stdout_lock_.lock();
-    write(STDOUT_FILENO, rsp_str.c_str(), rsp_str.size());
-    stdout_lock_.unlock();
+      stdout_lock_.lock();
+      write(STDOUT_FILENO, rsp_str.c_str(), rsp_str.size());
+      stdout_lock_.unlock();
 
-    std::cerr << "Parse Done: " << translation_unit_name << std::endl;
-    std::cerr << "cnt: " << parse_cnt << std::endl;
-  });
+      LOG(INFO)<<"Parsing finish! Id:"<<emit->parse_id<<" ,Bufnr:"<<emit->buf_num<<" ,File:"<<emit->translation_unit_name;
+
+      // decrease the thread_number_ so other request can by emit
+      thread_counter_lock_.lock();
+      thread_number_--;
+      LOG(INFO)<<"Thread number--:"<<thread_number_;
+      thread_counter_lock_.unlock();
+    }, req);
+  }else{
+    LOG(INFO)<<"Not enough thread, request dropped!!!";
+  }
 }

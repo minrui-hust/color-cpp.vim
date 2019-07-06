@@ -14,8 +14,6 @@
 #include "json_parser.h"
 #include "syntax_analyzer.h"
 
-#define LOG_ENABLE 0
-
 constexpr int kStdinBufferSize = 1024 * 1024; // 1M
 
 void setupLog(char **argv) {
@@ -32,19 +30,15 @@ void setupLog(char **argv) {
     mkdir((this_program_folder + "/../log").c_str(), 0777);
   }
 
-#if LOG_ENABLE
   google::InitGoogleLogging(argv[0]);
   google::SetLogDestination(google::GLOG_INFO,
                             (this_program_folder + "/../log/").c_str());
-#endif
-
-  // redirect the stderr to /log/err.log
-  freopen((this_program_folder + "/../log/stderr.log").c_str(), "w", stderr);
-  std::cerr << "Error logging started" << std::endl;
 }
 
 int main(int /* argc */, char **argv) {
+#ifdef LOG_ENABLE
   setupLog(argv);
+#endif
 
   char *stdin_buf = new char[kStdinBufferSize + 1];
   size_t stdin_read_size;
@@ -59,7 +53,7 @@ int main(int /* argc */, char **argv) {
       if (json_value) {
         analyzer.processRequest(*json_value);
       } else {
-        std::cerr << "parse json string error" << std::endl;
+        LOG(ERROR)<<"Parse json packet failed";
       }
     }
   }
