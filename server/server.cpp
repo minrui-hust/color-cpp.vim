@@ -28,22 +28,22 @@ void setupLog(char **argv) {
   std::string this_program_folder = this_program_path.substr(0, pos);
 
   // check if log folder exist
-  if (access((this_program_folder + "/log").c_str(), 0) < 0) {
-    mkdir((this_program_folder + "/log").c_str(), 0777);
+  if (access((this_program_folder + "/../log").c_str(), 0) < 0) {
+    mkdir((this_program_folder + "/../log").c_str(), 0777);
   }
 
 #if LOG_ENABLE
   google::InitGoogleLogging(argv[0]);
   google::SetLogDestination(google::GLOG_INFO,
-                            (this_program_folder + "/log/").c_str());
+                            (this_program_folder + "/../log/").c_str());
 #endif
 
   // redirect the stderr to /log/err.log
-  freopen((this_program_folder + "/log/err.log").c_str(), "w", stderr);
+  freopen((this_program_folder + "/../log/stderr.log").c_str(), "w", stderr);
   std::cerr << "Error logging started" << std::endl;
 }
 
-int main(int argc, char **argv) {
+int main(int /* argc */, char **argv) {
   setupLog(argv);
 
   char *stdin_buf = new char[kStdinBufferSize + 1];
