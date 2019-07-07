@@ -43,7 +43,7 @@ function! pysupport#force_parse_current_buffer()
 endfunction
 
 function! pysupport#handle_response(channel, response)
-  "echom a:response
+  "echom "response"
   python3 cli.handleResponse(vim.eval("a:response"))
 endfunction
 

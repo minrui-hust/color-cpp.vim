@@ -26,6 +26,7 @@
 #include <memory>
 #include <string>
 #include <time.h>
+#include <iostream>
 
 #include "glog/logging.h"
 
@@ -90,7 +91,7 @@ TranslationUnit::TranslationUnit(const std::string &filename,
       const_cast<CXUnsavedFile *>(unsaved), cxunsaved_files.size(),
       EditingOptions(), &clang_translation_unit_);
   if (failure != CXError_Success) {
-    //LOG(INFO)<<"Parse failed";
+    std::cerr<<__FILE__<<":"<<__LINE__<<" Clang Parse Error"<<std::endl;
     throw ClangParseError(failure);
   }
 }
@@ -161,7 +162,7 @@ void TranslationUnit::Reparse(std::vector<CXUnsavedFile> &unsaved_files,
   }
 
   if (failure != CXError_Success) {
-    //LOG(INFO)<<"Reparse failed";
+    std::cerr<<__FILE__<<":"<<__LINE__<<" Clang Parse Error"<<std::endl;
     Destroy();
     throw ClangParseError(failure);
   }
@@ -178,8 +179,6 @@ void TranslationUnit::UpdateLatestHighlights() {
   CXToken *tokens;
   CXSourceRange range = SourceRange();
   clang_tokenize(clang_translation_unit_, range, &tokens, &num_tokens);
-
-  //LOG(INFO)<<"token number: "<<num_tokens;
 
   std::vector<CXCursor> cursors(num_tokens);
   clang_annotateTokens(clang_translation_unit_, tokens, num_tokens,
@@ -200,16 +199,10 @@ void TranslationUnit::UpdateLatestHighlights() {
     std::string text{clang_getCString(spell)};
     clang_disposeString(spell);
 
-    //LOG(INFO)<<"Token: "<<text;
-    //LOG(INFO)<<"Kind: "<<kind;
-    //LOG(INFO)<<"Cursor_kind: "<<cursor_kind;
-    //LOG(INFO)<<"Cursor_type: "<<cursor_type;
-
     auto mapped(map_token_kind(kind, cursor_kind, cursor_type));
     if (mapped.size()) {
       Highlight highlight = BuildHighlight(text, mapped, line, column);
       latest_highlights_.push_back(highlight);
-      //LOG(INFO)<<"Add highlight: "<<text;
     }
   }
   clang_disposeTokens(clang_translation_unit_, tokens, num_tokens);

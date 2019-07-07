@@ -72,11 +72,17 @@ std::vector<Highlight> ClangAnalyzer::UpdateTranslationUnit(
   const std::vector< std::string > &flags ) {
   bool translation_unit_created;
 
-  shared_ptr< TranslationUnit > unit = translation_unit_store_.GetOrCreate(
-                                         translation_unit,
-                                         unsaved_files,
-                                         flags,
-                                         translation_unit_created );
+  shared_ptr< TranslationUnit > unit;
+  try {
+    unit = translation_unit_store_.GetOrCreate(
+        translation_unit,
+        unsaved_files,
+        flags,
+        translation_unit_created );
+  } catch(const ClangParseError &){
+    std::cerr<<__FILE__<<":"<<__FILE__<<" Get or create TU failed"<<std::endl;
+    return std::vector<Highlight>();
+  }
 
   try {
     return unit->Reparse( unsaved_files );
@@ -85,6 +91,7 @@ std::vector<Highlight> ClangAnalyzer::UpdateTranslationUnit(
     // valid anymore and needs to be destroyed and removed from the filename ->
     // TU map.
     translation_unit_store_.Remove( translation_unit );
-    throw;
+    std::cerr<<__FILE__<<":"<<__FILE__<<" Parse TU failed"<<std::endl;
+    return std::vector<Highlight>();
   }
 }

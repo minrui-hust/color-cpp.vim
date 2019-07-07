@@ -19,6 +19,7 @@ class SyntaxAnalyzer{
 
   private:
     static const int kMaxThreadNum;
+    static const int kTokenMaxSize;
     int thread_number_ = 0;
     std::mutex thread_counter_lock_;
     std::mutex stdout_lock_;

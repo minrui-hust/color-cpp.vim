@@ -45,7 +45,7 @@ class VimBuffer(object):
 
 
     def handleParseResponse(self, response):
-        if 'highlights' in response:
+        if 'highlights' in response and response['highlights'] is not None:
             self._highlight.updateWithNewHighlights(response['highlights'])
 
         self._parse_doing = False;

@@ -14,7 +14,7 @@
 #include "json_parser.h"
 #include "syntax_analyzer.h"
 
-constexpr int kStdinBufferSize = 1024 * 1024; // 1M
+constexpr int kStdinBufferSize = 4 * 1024 * 1024; // 4M
 
 void setupLog(char **argv) {
   // get the path of server
@@ -30,9 +30,7 @@ void setupLog(char **argv) {
     mkdir((this_program_folder + "/../log").c_str(), 0777);
   }
 
-  google::InitGoogleLogging(argv[0]);
-  google::SetLogDestination(google::GLOG_INFO,
-                            (this_program_folder + "/../log/").c_str());
+  std::freopen((this_program_folder + "/../log/stderr.log").c_str(), "w", stderr );
 }
 
 int main(int /* argc */, char **argv) {
@@ -53,7 +51,7 @@ int main(int /* argc */, char **argv) {
       if (json_value) {
         analyzer.processRequest(*json_value);
       } else {
-        LOG(ERROR)<<"Parse json packet failed";
+        std::cerr<<"Parse json packet failed";
       }
     }
   }

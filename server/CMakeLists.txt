@@ -28,7 +28,6 @@ add_executable(clang_server
                )
 target_link_libraries(clang_server
   jsoncpp
-  glog
   clang_analyzer
   clang
   )
