@@ -97,10 +97,5 @@ function! colorcpp#add_highlight_match(bufnr, type, line, col, len)
   "echom a:type.",".a:line.",".a:col.",".a:len
 endfunction!
 
-function! colorcpp#install()
-  execute 'lcd ' . $VIMHOME
-  execute '!' . './install.bash'
-endfunction
-
 let &cpo = s:save_cpo
 unlet s:save_cpo
