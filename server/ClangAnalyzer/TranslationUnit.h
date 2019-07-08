@@ -53,7 +53,7 @@ public:
 
   bool IsCurrentlyUpdating() const;
 
-  std::vector<Highlight> Reparse(
+  std::shared_ptr<std::vector<Highlight>> Reparse(
     const std::vector< UnsavedFile > &unsaved_files);
 
 private:

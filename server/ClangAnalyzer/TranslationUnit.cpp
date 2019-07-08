@@ -20,13 +20,13 @@
 #include "ClangUtils.h"
 #include "TokenKindMap.h"
 
+#include <time.h>
 #include <algorithm>
 #include <cstdlib>
 #include <fstream>
+#include <iostream>
 #include <memory>
 #include <string>
-#include <time.h>
-#include <iostream>
 
 #include "glog/logging.h"
 
@@ -40,11 +40,9 @@ namespace {
 
 unsigned EditingOptions() {
   // See cpp/llvm/include/clang-c/Index.h file for detail on these options.
-  return CXTranslationUnit_DetailedPreprocessingRecord |
-         CXTranslationUnit_Incomplete |
+  return CXTranslationUnit_DetailedPreprocessingRecord | CXTranslationUnit_Incomplete |
          CXTranslationUnit_IncludeBriefCommentsInCodeCompletion |
-         CXTranslationUnit_CreatePreambleOnFirstParse |
-         CXTranslationUnit_KeepGoing |
+         CXTranslationUnit_CreatePreambleOnFirstParse | CXTranslationUnit_KeepGoing |
          clang_defaultEditingTranslationUnitOptions();
 }
 
@@ -52,7 +50,7 @@ unsigned ReparseOptions(CXTranslationUnit translationUnit) {
   return clang_defaultReparseOptions(translationUnit);
 }
 
-void EnsureCompilerNamePresent(std::vector<const char *> &flags) {
+void EnsureCompilerNamePresent(std::vector<const char*>& flags) {
   bool no_compiler_name_set = !flags.empty() && flags.front()[0] == '-';
 
   if (flags.empty() || no_compiler_name_set) {
@@ -60,39 +58,43 @@ void EnsureCompilerNamePresent(std::vector<const char *> &flags) {
   }
 }
 
-} // unnamed namespace
+}  // unnamed namespace
 
-using CodeCompleteResultsWrap =
-    shared_ptr<remove_pointer<CXCodeCompleteResults>::type>;
+using CodeCompleteResultsWrap = shared_ptr<remove_pointer<CXCodeCompleteResults>::type>;
 
-TranslationUnit::TranslationUnit() : clang_translation_unit_(nullptr) {}
+TranslationUnit::TranslationUnit() : clang_translation_unit_(nullptr) {
+  std::cerr << "Create an Empty TU" << std::endl;
+}
 
-TranslationUnit::TranslationUnit(const std::string &filename,
-                                 const std::vector<UnsavedFile> &unsaved_files,
-                                 const std::vector<std::string> &flags,
-                                 CXIndex clang_index)
+TranslationUnit::TranslationUnit(const std::string& filename,
+                                 const std::vector<UnsavedFile>& unsaved_files,
+                                 const std::vector<std::string>& flags, CXIndex clang_index)
     : filename_(filename), clang_translation_unit_(nullptr) {
-  std::vector<const char *> pointer_flags;
+  std::vector<const char*> pointer_flags;
   pointer_flags.reserve(flags.size());
 
-  for (const std::string &flag : flags) {
+  for (const std::string& flag : flags) {
     pointer_flags.push_back(flag.c_str());
   }
 
   EnsureCompilerNamePresent(pointer_flags);
 
   std::vector<CXUnsavedFile> cxunsaved_files = ToCXUnsavedFiles(unsaved_files);
-  const CXUnsavedFile *unsaved =
-      cxunsaved_files.empty() ? nullptr : &cxunsaved_files[0];
+  const CXUnsavedFile* unsaved = cxunsaved_files.empty() ? nullptr : &cxunsaved_files[0];
 
   // Actually parse the translation unit.
   CXErrorCode failure = clang_parseTranslationUnit2FullArgv(
       clang_index, filename.c_str(), &pointer_flags[0], pointer_flags.size(),
-      const_cast<CXUnsavedFile *>(unsaved), cxunsaved_files.size(),
-      EditingOptions(), &clang_translation_unit_);
+      const_cast<CXUnsavedFile*>(unsaved), cxunsaved_files.size(), EditingOptions(),
+      &clang_translation_unit_);
   if (failure != CXError_Success) {
-    std::cerr<<__FILE__<<":"<<__LINE__<<" Clang Parse Error"<<std::endl;
+    std::cerr << __FILE__ << ":" << __LINE__ << " Clang Parse Error" << std::endl;
     throw ClangParseError(failure);
+  }
+
+  if (!clang_translation_unit_) {
+    std::cerr << __FILE__ << ":" << __LINE__ << "clang_translation_unit_ initialize failed"
+              << std::endl;
   }
 }
 
@@ -118,23 +120,26 @@ bool TranslationUnit::IsCurrentlyUpdating() const {
   return !lock.owns_lock();
 }
 
-std::vector<Highlight>
-TranslationUnit::Reparse(const std::vector<UnsavedFile> &unsaved_files) {
+std::shared_ptr<std::vector<Highlight>> TranslationUnit::Reparse(
+    const std::vector<UnsavedFile>& unsaved_files) {
   std::vector<CXUnsavedFile> cxunsaved_files = ToCXUnsavedFiles(unsaved_files);
 
   Reparse(cxunsaved_files);
 
-  unique_lock<mutex> lock(highlights_mutex_);
-  return latest_highlights_;
+  std::shared_ptr<std::vector<Highlight>> highlights;
+  highlights_mutex_.lock();
+  highlights = std::make_shared<std::vector<Highlight>>(latest_highlights_);
+  highlights_mutex_.unlock();
+
+  return highlights;
 }
 
 // Argument taken as non-const ref because we need to be able to pass a
 // non-const pointer to clang. This function (and clang too) will not modify the
 // param though.
-void TranslationUnit::Reparse(std::vector<CXUnsavedFile> &unsaved_files) {
-  unsigned options =
-      (clang_translation_unit_ ? ReparseOptions(clang_translation_unit_)
-                               : static_cast<unsigned>(CXReparse_None));
+void TranslationUnit::Reparse(std::vector<CXUnsavedFile>& unsaved_files) {
+  unsigned options = (clang_translation_unit_ ? ReparseOptions(clang_translation_unit_)
+                                              : static_cast<unsigned>(CXReparse_None));
 
   Reparse(unsaved_files, options);
 }
@@ -142,18 +147,17 @@ void TranslationUnit::Reparse(std::vector<CXUnsavedFile> &unsaved_files) {
 // Argument taken as non-const ref because we need to be able to pass a
 // non-const pointer to clang. This function (and clang too) will not modify the
 // param though.
-void TranslationUnit::Reparse(std::vector<CXUnsavedFile> &unsaved_files,
-                              size_t parse_options) {
+void TranslationUnit::Reparse(std::vector<CXUnsavedFile>& unsaved_files, size_t parse_options) {
   CXErrorCode failure;
   {
     unique_lock<mutex> lock(clang_access_mutex_);
 
     if (!clang_translation_unit_) {
+      std::cerr << __FILE__ << ":" << __LINE__ << " clang_translation_unit_ is Null" << std::endl;
       return;
     }
 
-    CXUnsavedFile *unsaved =
-        unsaved_files.empty() ? nullptr : &unsaved_files[0];
+    CXUnsavedFile* unsaved = unsaved_files.empty() ? nullptr : &unsaved_files[0];
 
     // This function should technically return a CXErrorCode enum but return an
     // int instead.
@@ -162,7 +166,7 @@ void TranslationUnit::Reparse(std::vector<CXUnsavedFile> &unsaved_files,
   }
 
   if (failure != CXError_Success) {
-    std::cerr<<__FILE__<<":"<<__LINE__<<" Clang Parse Error"<<std::endl;
+    std::cerr << __FILE__ << ":" << __LINE__ << " Clang Parse Error" << std::endl;
     Destroy();
     throw ClangParseError(failure);
   }
@@ -176,13 +180,12 @@ void TranslationUnit::UpdateLatestHighlights() {
 
   latest_highlights_.clear();
   unsigned int num_tokens;
-  CXToken *tokens;
+  CXToken* tokens;
   CXSourceRange range = SourceRange();
   clang_tokenize(clang_translation_unit_, range, &tokens, &num_tokens);
 
   std::vector<CXCursor> cursors(num_tokens);
-  clang_annotateTokens(clang_translation_unit_, tokens, num_tokens,
-                       cursors.data());
+  clang_annotateTokens(clang_translation_unit_, tokens, num_tokens, cursors.data());
   for (size_t i = 0; i < num_tokens; ++i) {
     CXToken token = tokens[i];
     CXTokenKind kind{clang_getTokenKind(token)};
@@ -205,6 +208,8 @@ void TranslationUnit::UpdateLatestHighlights() {
       latest_highlights_.push_back(highlight);
     }
   }
+  std::cerr << "lastest_highlights_ size:" << latest_highlights_.size() << std::endl;
+
   clang_disposeTokens(clang_translation_unit_, tokens, num_tokens);
 }
 
@@ -214,10 +219,8 @@ CXSourceRange TranslationUnit::SourceRange() {
   CXFile const file{clang_getFile(clang_translation_unit_, filename_.c_str())};
   clang_getFileContents(clang_translation_unit_, file, &size);
 
-  CXSourceLocation const top(
-      clang_getLocationForOffset(clang_translation_unit_, file, 0));
-  CXSourceLocation const bottom(
-      clang_getLocationForOffset(clang_translation_unit_, file, size));
+  CXSourceLocation const top(clang_getLocationForOffset(clang_translation_unit_, file, 0));
+  CXSourceLocation const bottom(clang_getLocationForOffset(clang_translation_unit_, file, size));
 
   if (clang_equalLocations(top, clang_getNullLocation()) ||
       clang_equalLocations(bottom, clang_getNullLocation())) {

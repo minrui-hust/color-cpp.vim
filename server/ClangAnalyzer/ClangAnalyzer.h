@@ -41,7 +41,7 @@ public:
 
   bool UpdatingTranslationUnit( const std::string &filename );
 
-  std::vector<Highlight> UpdateTranslationUnit(
+  std::shared_ptr<std::vector<Highlight>> UpdateTranslationUnit(
     const std::string &translation_unit,
     const std::vector< UnsavedFile > &unsaved_files,
     const std::vector< std::string > &flags );
