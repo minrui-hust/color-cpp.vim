@@ -2,7 +2,7 @@
 " Maintainer: Jeaye <contact@jeaye.com>
 
 "hi link ColorCodeType                      Type
-hi ColorCodeType ctermfg=Blue guifg=#164f99
+hi ColorCodeType ctermfg=Blue guifg=#729FCF
 hi link StructDecl                         ColorCodeType
 hi link UnionDecl                          ColorCodeType
 hi link ClassDecl                          ColorCodeType
