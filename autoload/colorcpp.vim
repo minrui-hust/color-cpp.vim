@@ -75,7 +75,6 @@ function! s:setup_server() abort
     finish
   endif
   let g:colorcpp_job_channel = job_getchannel(s:server_job)
-  call ch_logfile("/home/mr/ch.log", "w")
 endfunction
 
 function! colorcpp#clear_highlight_match(bufnr)
