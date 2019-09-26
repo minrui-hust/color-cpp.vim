@@ -30,7 +30,9 @@ void setupLog(char** argv) {
     mkdir((this_program_folder + "/../log").c_str(), 0777);
   }
 
-  std::freopen((this_program_folder + "/../log/stderr.log").c_str(), "w", stderr);
+  std::freopen(
+      (this_program_folder + "/../log/stderr." + std::to_string(getpid()) + ".log").c_str(), "w",
+      stderr);
 }
 
 int main(int /* argc */, char** argv) {
@@ -43,6 +45,7 @@ int main(int /* argc */, char** argv) {
   JsonParser parser;
   SyntaxAnalyzer analyzer;
   std::shared_ptr<std::string> response;
+  int err_cnt = 0;
 
   while (true) {
     stdin_read_size = read(STDIN_FILENO, stdin_buf, kStdinBufferSize);
@@ -51,7 +54,14 @@ int main(int /* argc */, char** argv) {
       if (json_value) {
         analyzer.processRequest(*json_value);
       } else {
-        std::cerr << "Parse json packet failed";
+        std::cerr << "Parse json packet failed" << std::endl;
+      }
+      err_cnt = 0;
+    } else {
+      std::cerr << "Stdin read size ZERO" << std::endl;
+      if (++err_cnt > 1000) {
+        std::cerr << "Excceed max error " << std::endl;
+        return 0;
       }
     }
   }

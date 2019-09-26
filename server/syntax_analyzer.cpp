@@ -5,7 +5,7 @@
 #include "glog/logging.h"
 
 const int SyntaxAnalyzer::kMaxThreadNum = 6;
-const int SyntaxAnalyzer::kTokenMaxSize = 100;
+const int SyntaxAnalyzer::kTokenMaxSize = 1000;
 
 SyntaxAnalyzer::SyntaxAnalyzer() {
   Json::StreamWriterBuilder builer;
