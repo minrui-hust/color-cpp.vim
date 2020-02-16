@@ -1,5 +1,4 @@
 from ycmd.completers.cpp.flags import Flags
-from ycmd.utils import ToCppStringCompatible
 import vimsupport as vs
 import highlight as hl
 
